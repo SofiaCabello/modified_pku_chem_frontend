@@ -2,61 +2,108 @@
   <!--这是库存药物列表，包含过滤器、表格、分页器-->
   <div class="drug-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.name" placeholder="药物名称" class="filter-item" @keyup.enter.native="handleFilter" style="width: 210px"></el-input>
-      <el-input v-model="listQuery.id" placeholder="药物编码" class="filter-item" @keyup.enter.native="handleFilter" style="width: 210px"></el-input>
-      <el-input v-model="listQuery.manufacturer" placeholder="生产厂家" class="filter-item" @keyup.enter.native="handleFilter" style="width: 210px"></el-input>
-      <el-select v-model="listQuery.type" placeholder="药物类型" class="filter-item" clearable style="width: 110px">
-        <el-option v-for="item in typeOptions" :key="item.key" :label="item.label" :value="item.key"/>
-      </el-select>     
-      <el-button type="primary" icon="el-icon-search"  class="filter-item" @click="handleFilter">检索</el-button>
+      <el-button type="primary" icon="el-icon-search"  class="filter-item" @click="openFilter">检索</el-button>
       <el-button type="primary" icon="el-icon-edit" style="margin-left: 10px" @click="handleCreate">添加</el-button>
       <el-button :loading="downloadLoading" type="primary" class="filter-item" icon="el-icon-download" @click="handleDownload">导出</el-button>
     </div>
 
+    <el-dialog title="高级检索" :visible.sync="queryFormVisible" width="50%" :close-on-click-modal="false">
+      <el-form ref="queryForm" :model="listQuery" label-width="100px" size="mini">
+        <el-form-item label="试剂名" prop="name">
+          <el-input v-model="listQuery.name" placeholder="请输入试剂名"></el-input>
+        </el-form-item>
+        <el-form-item label="试剂ID" prop="id">
+          <el-input v-model="listQuery.id" placeholder="请输入试剂ID"></el-input>
+        </el-form-item>
+        <el-form-item label="厂家 & 品牌" prop="producer">
+          <el-input v-model="listQuery.producer" placeholder="请输入厂家 & 品牌"></el-input>
+        </el-form-item>
+        <el-form-item label="规格" prop="specification">
+          <el-input v-model="listQuery.specification" placeholder="请输入规格"></el-input>
+        </el-form-item>
+        <el-form-item label="别名" prop="nickName">
+          <el-input v-model="listQuery.nickName" placeholder="请输入别名"></el-input>
+        </el-form-item>
+        <el-form-item label="化学式" prop="formula">
+          <el-input v-model="listQuery.formula" placeholder="请输入化学式"></el-input>
+        </el-form-item>
+        <el-form-item label="CAS" prop="cas">
+          <el-input v-model="listQuery.cas" placeholder="请输入cas"></el-input>
+        </el-form-item>
+        <el-form-item label="位置" prop="location">
+          <el-input v-model="listQuery.location" placeholder="请输入位置"></el-input>
+        </el-form-item>
+        <el-form-item label="网址" prop="url">
+          <el-input v-model="listQuery.url" placeholder="请输入网址"></el-input>
+        </el-form-item>
+        <el-form-item label="库存" prop="stock">
+          <el-input v-model="listQuery.stock" placeholder="请输入库存"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="queryFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleFilter">确 定</el-button>
+      </div>
+    </el-dialog>
+  
+
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%" @sort-change="sortChange">
-      <el-table-column label="药物编码" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column label="试剂ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="药物名称" prop="name" width="120" align="center">
+      <el-table-column label="试剂名" prop="name" sortable="custom" width="120" align="center" :class-name="getSortClass('name')">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="药物类型" prop="type" width="120" align="center">
+      <el-table-column label="别名" prop="nickName" sortable="custom" width="120" align="center" :class-name="getSortClass('nickName')">
         <template slot-scope="{row}">
-          <span>{{ row.type }}</span>
+          <span>{{ row.nickName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="生产厂家" prop="manufacturer" width="120" align="center">
+      <el-table-column label="厂家 & 品牌" prop="producer" sortable="custom" width="150" align="center" :class-name="getSortClass('producer')">
         <template slot-scope="{row}">
-          <span>{{ row.manufacturer }}</span>
+          <span>{{ row.producer }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="药品描述" prop="description" width="120" align="center">
+      <el-table-column label="位置" prop="location"  sortable="custom" width="150" align="center" :class-name="getSortClass('location')">
         <template slot-scope="{row}">
-          <span>{{ row.description }}</span>
+          <span>{{ row.location }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="药物存量" prop="stock" width="120" align="center" sortable="custom" :class-name="getSortClass('stock')">
+      <el-table-column label="规格" prop="specification" sortable="custom" width="120" align="center" :class-name="getSortClass('specification')">
+        <template slot-scope="{row}">
+          <span>{{ row.specification }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="库存" prop="stock" width="60" align="center" sortable="custom" :class-name="getSortClass('stock')">
         <template slot-scope="{row}">
           <span>{{ row.stock }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="药物售价" prop="priceOut" width="120" align="center" sortable="custom" :class-name="getSortClass('priceOut')">
+      <el-table-column label="化学式" prop="formula" width="120" align="center" sortable="custom" :class-name="getSortClass('formula')">
         <template slot-scope="{row}">
-          <span>{{ row.priceOut }}</span>
+          <span>{{ row.formula }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="药物进价" prop="priceIn" width="120" align="center" sortable="custom" :class-name="getSortClass('priceIn')">
+      <el-table-column label="CAS" prop="cas" width="120" align="center" sortable="custom" :class-name="getSortClass('cas')">
         <template slot-scope="{row}">
-          <span>{{ row.priceIn }}</span>
+          <span>{{ row.cas }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+    <el-table-column label="网址" prop="url" width="120" align="center" sortable="custom" :class-name="getSortClass('url')">
+      <template slot-scope="{row}">
+        <span>{{ row.url }}</span>
+      </template>"
+    </el-table-column>
+      <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <el-button type="primary" size="mini" @click="handlePurchase(row)">
+            购买申请
+          </el-button>
+          <el-button type="warning" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
           <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
@@ -136,28 +183,34 @@ export default{
       listQuery: {
         page: 1,
         limit: 10,
-        name: undefined,
-        type: undefined,
-        manufacturer: undefined,
-        description: undefined,
-        stock: undefined,
-        priceOut: undefined,
-        priceIn: undefined,
         sort:'+id',
+        name: undefined,
+        id: undefined,  
+        producer: undefined,
+        specification: undefined,
+        nickName: undefined,
+        formula: undefined,
+        cas: undefined,
+        location: undefined,
+        url: undefined,
+        stock: undefined,
       },
       typeOptions,
       sortOptions:[{label:'编号升序',key:'+id'},{label:'编号降序',key:'-id'}],
       temp: {
         id: undefined,
         name: '',
-        type: undefined,
-        manufacturer: '',
-        description: '',
-        stock: undefined,
-        priceOut: undefined,
-        priceIn: undefined,
+        producer: '',
+        specification: '',
+        nickName: '',
+        formula: '',
+        cas: '',
+        location: '',
+        url: '',
+        stock: '',
       },
       dialogFormVisible: false,
+      queryFormVisible: false,
       dialogStatus: '',
       textMap: {
         update: '编辑药物',
@@ -204,9 +257,13 @@ export default{
         this.listLoading = false
       })
     },
+    openFilter(){
+      this.queryFormVisible = true
+    },
     handleFilter(){
       this.listQuery.page = 1
       this.getList()
+      this.queryFormVisible = false
     },
     sortChange(data){
       const { prop,order } = data
@@ -304,7 +361,7 @@ export default{
         })
     },
     handleDelete(row, index){
-      this.$confirm('此操作将永久删除该药物, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除该试剂, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -351,3 +408,12 @@ export default{
 }
 
 </script>
+
+<style lang="scss" scoped>
+.filter-container{
+  margin-top: 15px;
+  margin-bottom: 15px;
+  margin-left: 15px;
+}
+
+</style>

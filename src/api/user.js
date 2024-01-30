@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function login(data) {
   return request({
-    url: '/user/login',
+    url: '/login/userLogin',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function login(data) {
 
 export function getInfo(token) {
   return request({
-    url: '/user/info',
+    url: '/login/userInfo',
     method: 'get',
     params: { token }
   })
@@ -26,7 +26,7 @@ export function updateInfo(data) {
 
 export function logout() {
   return request({
-    url: '/user/logout',
+    url: '/login/logout',
     method: 'post'
   })
 }

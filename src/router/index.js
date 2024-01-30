@@ -67,7 +67,6 @@ export const constantRoutes = [
       }
     ]
   },
-
   {
     path: 'external-link',
     component: Layout,
@@ -84,27 +83,21 @@ export const asyncRoutes = [
   {
     path: '/database',
     component: Layout,
-    redirect: '/database/table',
+    redirect: '/database/drug',
     name: '数据库',
     meta: { title: '数据库', icon: 'el-icon-s-help',roles: ['admin','user'] },
     children: [
       {
         path: 'drug',
-        name: '库存药物',
+        name: '试剂库',
         component: () => import('@/views/database/drug/index'),
-        meta: { title: '库存药物', icon: 'table',roles: ['admin','user'] }
+        meta: { title: '试剂库', icon: 'table',roles: ['admin','user'] }
       },
       {
-        path: 'finished',
-        name: '已完成订单',
-        component: () => import('@/views/database/order/finished/index'),
-        meta: { title: '已完成订单', icon: 'table', roles: ['admin','user']}
-      },
-      {
-        path: 'unfinished',
-        name: '未完成订单',
-        component: () => import('@/views/database/order/unfinished/index'),
-        meta: { title: '未完成订单', icon: 'table',roles: ['admin','user'] }
+        path: 'buy',
+        name: '购买申请',
+        component: () => import('@/views/database/request/buy/index'),
+        meta: { title: '我的申请', icon: 'table', roles: ['admin','user']}
       },
       {
         path: 'user',

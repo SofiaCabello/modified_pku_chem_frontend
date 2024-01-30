@@ -40,22 +40,6 @@
         </span>
       </el-form-item>
 
-      <el-form-item>
-        <el-input
-          ref="captcha"
-          v-model="loginForm.captcha"
-          placeholder="请输入验证码"
-          name="captcha"
-          type="text"
-          tabindex="3"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
-      </el-form-item>
-      <div class="captcha-container">
-        <img :src="captcha" @click="newcaptcha" />
-      </div>
-
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
       <div class="tips">
@@ -67,16 +51,14 @@
 </template>
 
 <script>
-import { getCaptcha } from '@/api/captcha'
-
 export default {
   name: 'Login',
   data() {
     return {
       captcha: '',
       loginForm: {
-        username: 'nihao',
-        password: '114514',
+        username: 'test1',
+        password: '111111',
       },
       loginRules: {
         username: [
@@ -91,9 +73,7 @@ export default {
       redirect: undefined
     }
   },
-  created(){
-    this.newcaptcha()
-  },
+  created(){},
   watch: {
     $route: {
       handler: function(route) {
@@ -129,11 +109,6 @@ export default {
         }
       })
     },
-    newcaptcha() {
-      getCaptcha().then(res => {
-        this.captcha = 'data:image/png;base64,'+res.data
-      })
-    }
   }
 }
 </script>
