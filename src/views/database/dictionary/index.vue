@@ -7,7 +7,7 @@
         v-for="tag in tagList.producerTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.producerTags,tag)"
+        @close="handleClose(tagList.producerTags,tag,'producerTags')"
       >
         {{ tag }}
       </el-tag>
@@ -17,7 +17,6 @@
         v-model="inputList.producerTags"
         ref="saveTagInput"
         size="small"
-        @keyup.enter.native="handleInputConfirm('producerTags')"
         @blur="handleInputConfirm('producerTags')"
         @keyup.escape.native="visibleList.producerTags = false"
       >
@@ -32,7 +31,7 @@
         v-for="tag in tagList.labTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.labTags, tag)"
+        @close="handleClose(tagList.labTags, tag, 'labTags')"
       >
         {{ tag }}
       </el-tag>
@@ -42,7 +41,6 @@
         v-model="inputList.labTags"
         ref="saveTagInput"
         size="small"
-        @keyup.enter.native="handleInputConfirm('labTags')"
         @blur="handleInputConfirm('labTags')"
         @keyup.escape.native="visibleList.labTags = false"
       >
@@ -57,7 +55,7 @@
         v-for="tag in tagList.locationTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.locationTags, tag)"
+        @close="handleClose(tagList.locationTags, tag, 'locationTags')"
       >
         {{ tag }}
       </el-tag>
@@ -67,7 +65,6 @@
         v-model="inputList.locationTags"
         ref="saveTagInput"
         size="small"
-        @keyup.enter.native="handleInputConfirm('locationTags')"
         @blur="handleInputConfirm('locationTags')"
         @keyup.escape.native="visibleList.locationTags = false"
       >
@@ -82,7 +79,7 @@
         v-for="tag in tagList.sourceTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.sourceTags, tag)"
+        @close="handleClose(tagList.sourceTags, tag, 'sourceTags')"
       >
         {{ tag }}
       </el-tag>
@@ -92,7 +89,6 @@
         v-model="inputList.sourceTags"
         ref="saveTagInput"
         size="small"
-        @keyup.enter.native="handleInputConfirm('sourceTags')"
         @blur="handleInputConfirm('sourceTags')"
         @keyup.escape.native="visibleList.sourceTags = false"
       >
@@ -107,7 +103,7 @@
         v-for="tag in tagList.wasteTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.wasteTags, tag)"
+        @close="handleClose(tagList.wasteTags, tag, 'wasteTags')"
       >
         {{ tag }}
       </el-tag>
@@ -117,7 +113,6 @@
         v-model="inputList.wasteTags"
         ref="saveTagInput"
         size="small"
-        @keyup.enter.native="handleInputConfirm('wasteTags')"
         @blur="handleInputConfirm('wasteTags')"
         @keyup.escape.native="visibleList.wasteTags = false"
       >
@@ -128,7 +123,7 @@
 </template>
 
 <script>
-import { getProducers, getLabs, getLocations, getSources, getWastes } from "@/api/dictionary";
+import { getDictionary, deleteDictionary, addDictionary } from '@/api/dictionary';
 
 export default {
   name: "dictionary",
@@ -156,15 +151,28 @@ export default {
         wasteTags: "",
       },
       inputValue: "",
-
+      addQuery: {
+        tagType: "",
+        tag: "",
+      },
+      deleteQuery: {
+        tagType: "",
+        tag: "",
+      }
     };
   },
-  created() {},
+  created() {
+    this.initTags()
+  },
   methods: {
-    handleClose(tags,tag) {
+    handleClose(tags,tag,tagName) {
       const index = tags.indexOf(tag);
-      if(index >= 0) {
-        tags.splice(index, 1);
+      if (index >= 0) {
+        this.deleteQuery.tagType = tagName;
+        this.deleteQuery.tag = tag;
+        deleteDictionary(this.deleteQuery).then(response => {
+          tags.splice(index, 1);
+        });
       }
     },
     showInput(tagType){
@@ -174,14 +182,25 @@ export default {
       });
     },
     handleInputConfirm(tagType) {
-      console.log(tagType);
       let inputValue = this.inputList[tagType];
-      console.log(inputValue);
       if (inputValue) {
-        this.tagList[tagType].push(inputValue);
-        this.inputList[tagType] = ""; // 清空输入框
+        this.addQuery.tagType = tagType;
+        this.addQuery.tag = inputValue;
+        addDictionary(this.addQuery).then(response => {
+          this.tagList[tagType].push(inputValue);
+          this.inputList[tagType] = ""; // 清空输入框
+        });
       }
       this.visibleList[tagType] = false; // 隐藏输入框
+    },
+    initTags(){
+      getDictionary().then(response => {
+        this.tagList.producerTags = response.data.producerTags
+        this.tagList.labTags = response.data.labTags
+        this.tagList.locationTags = response.data.locationTags
+        this.tagList.sourceTags = response.data.sourceTags
+        this.tagList.wasteTags = response.data.wasteTags
+      })
     }
   },
 };
@@ -198,7 +217,7 @@ export default {
 }
 
 .dictionary-container {
-  padding: 20px;
+  padding: 10px;
   // 设定内部元素的间距
   .drug-producer,
   .lab-location,

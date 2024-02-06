@@ -50,11 +50,8 @@
       <el-dialog title="新建申请" :visible.sync="createRequestVisible" width="50%" :close-on-click-modal="false">
         <el-form ref="queryForm"  :rules="rules" :model="temp" label-position="left" label-width="90px" style="width: 400px; margin-left: 50px;">
           <el-form-item label="垃圾类型" prop="type">
-            <el-select v-model="temp.type" placeholder="请选择垃圾类型">
-              <el-option label="干垃圾" value="干垃圾"></el-option>
-              <el-option label="湿垃圾" value="湿垃圾"></el-option>
-              <el-option label="可回收物" value="可回收物"></el-option>
-              <el-option label="有害垃圾" value="有害垃圾"></el-option>
+            <el-select v-model="temp.type" placeholder="请选择垃圾类型" style="width: 100%" class="filter-item">
+              <el-option v-for="item in wasteOptions" :key="item.label" :label="item.label" :value="item.label"/>
             </el-select>
           </el-form-item>
           <el-form-item label="垃圾位置" prop="location">
@@ -79,6 +76,7 @@
 import { getListBuy } from '@/api/request/buy.js'
 import { getListHazard } from '@/api/request/hazard.js'
 import { mapGetters } from 'vuex'
+import { getWasteDictionary } from '@/api/dictionary.js'
 import Pagination from '@/components/Pagination/index'
 
 export default {
@@ -123,12 +121,13 @@ export default {
         location: '',
         token: this.$store.getters.token,
       },
-
+      wasteOptions:[],
     }
   },
   created(){
     this.getBuyList()
     this.getHazardList()
+    this.getWasteList()
   },
   methods: {
     getBuyList(){
@@ -143,6 +142,11 @@ export default {
       getListHazard(this.hazardQuery).then(response => {
         this.hazardList = response.data.items
         this.hazardListLoading = false
+      })
+    },
+    getWasteList(){
+      getWasteDictionary().then(response => {
+        this.wasteOptions = response.data
       })
     },
     buySortChange(data){
@@ -166,12 +170,7 @@ export default {
     handleCreate(){
       
     }
-
-
   },
-
-
-
 }
 </script>
 

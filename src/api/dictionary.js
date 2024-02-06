@@ -1,38 +1,31 @@
 import request from '@/utils/request'
 
-export function getProducers(){
+export function getDictionary() {
   return request({
-      url: '/dictionary/getProducers',
-      method: 'get'
+    url: '/dictionary/get',
+    method: 'get',
   })
 }
 
-export function getLabs(){
+export function getWasteDictionary() {
   return request({
-      url: '/dictionary/getLabs',
-      method: 'get'
+    url: '/dictionary/getWaste',
+    method: 'get',
   })
 }
 
-export function getLocations(){
+export function deleteDictionary(query){
   return request({
-      url: '/dictionary/getLocations',
-      method: 'get'
+    url: '/dictionary/delete',
+    method: 'post',
+    params: query
   })
 }
 
-export function getSources(){
+export function addDictionary(query){
   return request({
-      url: '/dictionary/getSources',
-      method: 'get'
+    url: '/dictionary/add',
+    method: 'post',
+    params: query
   })
 }
-
-export function getWastes(){
-  return request({
-      url: '/dictionary/getWasteTypes',
-      method: 'get'
-  })
-}
-
-

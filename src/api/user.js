@@ -16,9 +16,25 @@ export function getInfo(token) {
   })
 }
 
-export function updateInfo(data) {
+export function updateUser(data) {
   return request({
-    url: '/userTable/updateUser',
+    url: '/user/updateUser',
+    method: 'post',
+    data
+  })
+}
+
+export function getUser(query){
+  return request({
+    url: '/user/getUser',
+    method: 'get',
+    params: query
+  })
+}
+
+export function createUser(data){
+  return request({
+    url: '/user/createUser',
     method: 'post',
     data
   })

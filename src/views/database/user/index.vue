@@ -3,6 +3,7 @@
   <div class="drug-container">
     <div class="filter-container">
       <el-input v-model="listQuery.username" placeholder="用户名" class="filter-item" @keyup.enter.native="handleFilter" style="width: 210px"></el-input>
+      <el-input v-model="listQuery.realName" placeholder="真实姓名" class="filter-item" @keyup.enter.native="handleFilter" style="width: 210px"></el-input>
       <el-input v-model="listQuery.id" placeholder="用户ID" class="filter-item" @keyup.enter.native="handleFilter" style="width: 210px"></el-input>
       <el-select v-model="listQuery.role" placeholder="用户角色" class="filter-item" clearable style="width: 110px">
         <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key"/>
@@ -21,6 +22,16 @@
       <el-table-column label="用户名" prop="username" width="120" align="center">
         <template slot-scope="{row}">
           <span>{{ row.username }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="用户密码" prop="password" width="120" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.passwordx }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="真实姓名" prop="realName" width="120" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.realName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="用户角色" prop="role" width="120" align="center">
@@ -48,6 +59,9 @@
         <el-form-item label="用户密码" prop="password">
           <el-input v-model="temp.password" placeholder="请输入用户密码"></el-input>
         </el-form-item>
+        <el-form-item label="真实姓名" prop="realName">
+          <el-input v-model="temp.realName" placeholder="请输入真实姓名"></el-input>
+        </el-form-item>
         <el-form-item label="用户角色" prop="role">
           <el-select v-model="temp.role" placeholder="请选择用户角色" style="width: 100%" class="filter-item">
             <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key"/>
@@ -64,7 +78,8 @@
 
 <script>
 import Pagination from '@/components/Pagination/index'
-import { createUser, deleteUser, updateUser, fetchList } from '@/api/userTable'
+import { getUser,updateUser, createUser } from '@/api/user'
+
 
 const roleOptions = [
   { key: 'admin', label: '管理员' },
@@ -94,6 +109,7 @@ export default{
         page: 1,
         limit: 10,
         username: undefined,
+        realName: undefined,
         id: undefined,
         role: undefined,
         sort:'+id',
@@ -103,6 +119,7 @@ export default{
         id: undefined,
         username: '',
         password: '',
+        realName: '',
         role: ''
       },
       dialogFormVisible: false,
@@ -110,19 +127,7 @@ export default{
       textMap: {
         create: '添加用户',
       },
-      rules:{
-        username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
-        ],
-        password: [
-          { required: true, message: '请输入用户密码', trigger: 'blur' },
-          { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
-        ],
-        role: [
-          { required: true, message: '请选择用户角色', trigger: 'change' }
-        ]
-      },
+      rules:{},
       downloadLoading: false
     }
   },
@@ -132,7 +137,7 @@ export default{
   methods:{
     getList(){
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
+      getUser(this.listQuery).then(response => {
         this.list = response.data
         this.total = response.total
         this.listLoading = false
@@ -191,6 +196,7 @@ export default{
       this.$refs['dataForm'].validate((valid) => {
         if(valid){
           const tempData = Object.assign({},this.temp)
+          console.log(tempData)
           createUser(tempData).then(() => {
             this.getList()
             this.dialogFormVisible = false
