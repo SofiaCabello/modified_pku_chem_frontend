@@ -14,32 +14,32 @@
     </div>
 
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%" @sort-change="sortChange">
-      <el-table-column label="用户编号" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column label="用户编号" prop="id" sortable="custom" align="center"  :class-name="getSortClass('id')">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="用户名" prop="username" width="120" align="center">
+      <el-table-column label="用户名" prop="username"  align="center">
         <template slot-scope="{row}">
           <span>{{ row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="用户密码" prop="password" width="120" align="center">
+      <el-table-column label="用户密码" prop="password"  align="center">
         <template slot-scope="{row}">
-          <span>{{ row.passwordx }}</span>
+          <span>{{ row.password }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="真实姓名" prop="realName" width="120" align="center">
+      <el-table-column label="真实姓名" prop="realName" align="center">
         <template slot-scope="{row}">
           <span>{{ row.realName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="用户角色" prop="role" width="120" align="center">
+      <el-table-column label="用户角色" prop="role" align="center">
         <template slot-scope="{row}">
           <span>{{ row.role }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
           <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
             删除

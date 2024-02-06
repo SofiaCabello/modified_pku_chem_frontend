@@ -14,6 +14,20 @@ export function getWasteDictionary() {
   })
 }
 
+export function getLocationDictionary() {
+  return request({
+    url: '/dictionary/getLocation',
+    method: 'get',
+  })
+}
+
+export function getLabDictionary(){
+  return request({
+    url: '/dictionary/getLab',
+    method: 'get',
+  })
+}
+
 export function deleteDictionary(query){
   return request({
     url: '/dictionary/delete',
