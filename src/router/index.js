@@ -101,9 +101,15 @@ export const asyncRoutes = [
       },
       {
         path: 'user',
-        name: '用户',
+        name: '用户管理',
         component: () => import('@/views/database/user/index'),
-        meta: { title: '用户', icon: 'table' ,roles: ['admin']}
+        meta: { title: '用户管理', icon: 'table' ,roles: ['admin']}
+      },
+      {
+        path: 'dictionary',
+        name: '选项管理',
+        component: () => import('@/views/database/dictionary/index'),
+        meta: { title: '选项管理', icon: 'table',roles: ['admin']} 
       }
     ]
   },

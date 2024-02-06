@@ -100,7 +100,7 @@
     </el-table-column>
       <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="handlePurchase(row)">
+          <el-button type="primary" size="mini" @click="purchaseVisible = true; purchaseTemp = row">
             购买申请
           </el-button>
           <el-button type="warning" size="mini" @click="handleUpdate(row)">
@@ -113,33 +113,59 @@
       </el-table-column>
     </el-table>
 
+    <el-dialog title="购买申请" :visible.sync="purchaseVisible">
+      <el-form ref="dataForm" :model="purchaseTemp" label-position="left" label-width="120px" style="width: 400px; margin-left: 50px;">
+        <el-form-item label="当前药物信息" prop="name">
+          编号为{{purchaseTemp.id}}，{{purchaseTemp.producer}}生产的{{ purchaseTemp.specification }}规格的{{ purchaseTemp.name }}
+        </el-form-item>
+        <el-form-item label="请选择购买渠道" prop="name">
+          <el-radio-group v-model="purchaseTemp.purchaseChannel">
+            <el-radio label="1">京东</el-radio>
+            <el-radio label="2">淘宝</el-radio>
+            <el-radio label="3">其他</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="当前日期" prop="name">
+          {{ new Date().toLocaleDateString() }}
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+          <el-button @click="purchaseVisible = false">取 消</el-button>
+          <el-button type="primary" @click="handlePurchaseRequest">确 定</el-button>
+        </div>
+    </el-dialog>
+
     <!--分页器-->
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="90px" style="width: 400px; margin-left: 50px;">
-        <el-form-item label="药物名称" prop="name">
-          <el-input v-model="temp.name" placeholder="请输入药物名称"></el-input>
+        <el-form-item label="试剂名" prop="name">
+          <el-input v-model="temp.name" placeholder="请输入试剂名"></el-input>
         </el-form-item>
-        <el-form-item label="药物类型" prop="type">
-          <el-select v-model="temp.type" placeholder="请选择药物类型" style="width: 100%" class="filter-item">
-            <el-option v-for="item in typeOptions" :key="item.key" :label="item.label" :value="item.key"/>
-          </el-select>
-        </el-form-item> 
-        <el-form-item label="生产厂家" prop="manufacturer">
-          <el-input v-model="temp.manufacturer" placeholder="请输入生产厂家"></el-input>
+        <el-form-item label="别名" prop="nickName">
+          <el-input v-model="temp.nickName" placeholder="请输入别名"></el-input>
         </el-form-item>
-        <el-form-item label="药品描述" prop="description">
-          <el-input v-model="temp.description" placeholder="请输入药品描述"></el-input>
+        <el-form-item label="厂家 & 品牌" prop="producer">
+          <el-input v-model="temp.producer" placeholder="请输入厂家 & 品牌"></el-input>
         </el-form-item>
-        <el-form-item label="药物存量" prop="stock">
-          <el-input v-model="temp.stock" placeholder="请输入药物存量"></el-input>
+        <el-form-item label="位置" prop="location">
+          <el-input v-model="temp.location" placeholder="请输入位置"></el-input>
         </el-form-item>
-        <el-form-item label="药物售价" prop="priceOut">
-          <el-input v-model="temp.priceOut" placeholder="请输入药物单价"></el-input>
+        <el-form-item label="规格" prop="specification">
+          <el-input v-model="temp.specification" placeholder="请输入规格"></el-input>
         </el-form-item>
-        <el-form-item label="药物进价" prop="priceIn">
-          <el-input v-model="temp.priceIn" placeholder="请输入药物进价"></el-input>
+        <el-form-item label="库存" prop="stock">
+          <el-input v-model="temp.stock" placeholder="请输入库存"></el-input>
+        </el-form-item>
+        <el-form-item label="化学式" prop="formula">
+          <el-input v-model="temp.formula" placeholder="请输入化学式"></el-input>
+        </el-form-item>
+        <el-form-item label="CAS" prop="cas">
+          <el-input v-model="temp.cas" placeholder="请输入CAS"></el-input>
+        </el-form-item>
+        <el-form-item label="网址" prop="url">
+          <el-input v-model="temp.url" placeholder="请输入网址"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -152,19 +178,8 @@
 
 <script>
 import Pagination from '@/components/Pagination/index'
+import { postPurchaseRequest } from '@/api/request/buy'
 import { fetchList, updateDrug, createDrug, deleteDrug } from '@/api/drug'
-
-const typeOptions = [
-  {key: '中药', label: '中药'},
-  {key: '西药', label: '西药'},
-  {key: '中成药', label: '中成药'},
-  {key: '其他', label: '其他'},
-]
-
-const typeKeyValue = typeOptions.reduce((acc,cur) => {
-  acc[cur.key] = cur.label
-  return acc
-},{})
 
 export default{
   name:'drugTable',
@@ -195,9 +210,21 @@ export default{
         url: undefined,
         stock: undefined,
       },
-      typeOptions,
+      purchaseVisible: false,
       sortOptions:[{label:'编号升序',key:'+id'},{label:'编号降序',key:'-id'}],
       temp: {
+        id: undefined,
+        name: '',
+        producer: '',
+        specification: '',
+        nickName: '',
+        formula: '',
+        cas: '',
+        location: '',
+        url: '',
+        stock: '',
+      },
+      purchaseTemp: {
         id: undefined,
         name: '',
         producer: '',
@@ -213,8 +240,8 @@ export default{
       queryFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: '编辑药物',
-        create: '添加药物'
+        update: '编辑试剂',
+        create: '添加试剂'
       },
       rules:{
         name: [
@@ -401,7 +428,14 @@ export default{
     getSortClass: function(key){
       const sort = this.listQuery.sort
       return sort === key ? 'ascending' : sort === '-' + key ? 'descending' : ''
+    },
+    handlePurchaseRequest(){
+      const tempData = Object.assign({},this.purchaseTemp)
+      postPurchaseRequest(tempData).then(() => {
+        this.purchaseVisible = false
+      })
     }
+    
     
   }
   

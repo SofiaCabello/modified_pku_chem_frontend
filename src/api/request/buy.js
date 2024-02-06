@@ -7,3 +7,11 @@ export function getListBuy(query) {
     params: query
   })
 }
+
+export function postPurchaseRequest(data){
+  return request({
+    url: '/purchaseRequest/addRequest',
+    method: 'post',
+    data
+  })
+}
