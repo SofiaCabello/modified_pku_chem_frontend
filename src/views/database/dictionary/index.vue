@@ -4,25 +4,25 @@
       <h1 class="title">试剂制造商</h1>
       <el-tag
         :key="tag"
-        v-for="tag in tagList.drugTags"
+        v-for="tag in tagList.producerTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.drugTags,tag)"
+        @close="handleClose(tagList.producerTags,tag)"
       >
         {{ tag }}
       </el-tag>
       <el-input
         class="input-new-tag"
-        v-if="visibleList.drugTags"
-        v-model="inputList.drugTags"
+        v-if="visibleList.producerTags"
+        v-model="inputList.producerTags"
         ref="saveTagInput"
         size="small"
-        @keyup.enter.native="handleInputConfirm('drugTags')"
-        @blur="handleInputConfirm('drugTags')"
-        @keyup.escape.native="visibleList.drugTags = false"
+        @keyup.enter.native="handleInputConfirm('producerTags')"
+        @blur="handleInputConfirm('producerTags')"
+        @keyup.escape.native="visibleList.producerTags = false"
       >
       </el-input>
-      <el-button v-else class="button-new-tag" size="small" @click="showInput('drugTags')">+ New Tag</el-button>
+      <el-button v-else class="button-new-tag" size="small" @click="showInput('producerTags')">+ New Tag</el-button>
     </div>
 
     <div class="lab-location">
@@ -79,54 +79,81 @@
       <h1 class="title">购买渠道</h1>
       <el-tag
         :key="tag"
-        v-for="tag in tagList.purchaseTags"
+        v-for="tag in tagList.sourceTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.purchaseTagsS, tag)"
+        @close="handleClose(tagList.sourceTags, tag)"
       >
         {{ tag }}
       </el-tag>
       <el-input
         class="input-new-tag"
-        v-if="visibleList.purchaseTags"
-        v-model="inputList.purchaseTags"
+        v-if="visibleList.sourceTags"
+        v-model="inputList.sourceTags"
         ref="saveTagInput"
         size="small"
-        @keyup.enter.native="handleInputConfirm('purchaseTags')"
-        @blur="handleInputConfirm('purchaseTags')"
-        @keyup.escape.native="visibleList.purchaseTags = false"
+        @keyup.enter.native="handleInputConfirm('sourceTags')"
+        @blur="handleInputConfirm('sourceTags')"
+        @keyup.escape.native="visibleList.sourceTags = false"
       >
       </el-input>
-      <el-button v-else class="button-new-tag" size="small" @click="showInput('purchaseTags')">+ New Tag</el-button>
+      <el-button v-else class="button-new-tag" size="small" @click="showInput('sourceTags')">+ New Tag</el-button>
+    </div>
+
+    <div class="waste-type">
+      <h1 class="title">废弃类型</h1>
+      <el-tag
+        :key="tag"
+        v-for="tag in tagList.wasteTags"
+        closable
+        :disable-transitions="false"
+        @close="handleClose(tagList.wasteTags, tag)"
+      >
+        {{ tag }}
+      </el-tag>
+      <el-input
+        class="input-new-tag"
+        v-if="visibleList.wasteTags"
+        v-model="inputList.wasteTags"
+        ref="saveTagInput"
+        size="small"
+        @keyup.enter.native="handleInputConfirm('wasteTags')"
+        @blur="handleInputConfirm('wasteTags')"
+        @keyup.escape.native="visibleList.wasteTags = false"
+      >
+      </el-input>
+      <el-button v-else class="button-new-tag" size="small" @click="showInput('wasteTags')">+ New Tag</el-button>
     </div>
   </div>
 </template>
 
 <script>
-import { getDrugList } from '@/api/drug';
+import { getProducers, getLabs, getLocations, getSources, getWastes } from "@/api/dictionary";
 
 export default {
   name: "dictionary",
   data() {
     return {
       tagList:{
-        drugTags: ["标签一", "标签二", "标签三"],
-        labTags: ["实验室1", "实验室2", "实验室3"],
-        locationTags: ["位置1", "位置2", "位置3"],
-        purchaseTags: ["渠道1", "渠道2", "渠道3"],
+        producerTags: [],
+        labTags: [],
+        locationTags: [],
+        sourceTags: [],
+        wasteTags: [],
       },
-
       visibleList:{
-        drugTags: false,
+        producerTags: false,
         labTags: false,
         locationTags: false,
-        purchaseTags: false,
+        sourceTags: false,
+        wasteTags: false,
       },
       inputList: {
-        drugTags: "",
+        producerTags: "",
         labTags: "",
         locationTags: "",
-        purchaseTags: "",
+        sourceTags: "",
+        wasteTags: "",
       },
       inputValue: "",
 
