@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '医药商店数据管理系统',
+  title: 'RESIM@PKU',
 
   /**
    * @type {boolean} true | false

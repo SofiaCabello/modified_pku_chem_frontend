@@ -2,15 +2,15 @@
   <!--这是系统用户列表，包含过滤器、表格、分页器-->
   <div class="drug-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.username" placeholder="用户名" class="filter-item" @keyup.enter.native="handleFilter" style="width: 210px"></el-input>
-      <el-input v-model="listQuery.realName" placeholder="真实姓名" class="filter-item" @keyup.enter.native="handleFilter" style="width: 210px"></el-input>
-      <el-input v-model="listQuery.id" placeholder="用户ID" class="filter-item" @keyup.enter.native="handleFilter" style="width: 210px"></el-input>
-      <el-select v-model="listQuery.role" placeholder="用户角色" class="filter-item" clearable style="width: 110px">
-        <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key"/>
+      <el-input v-model="listQuery.username" placeholder="用户名" class="filter-item" @keyup.enter.native="handleFilter"></el-input>
+      <el-input v-model="listQuery.realName" placeholder="真实姓名" class="filter-item" @keyup.enter.native="handleFilter"></el-input>
+      <el-input v-model="listQuery.id" placeholder="用户ID" class="filter-item" @keyup.enter.native="handleFilter" ></el-input>
+      <el-select v-model="listQuery.role" placeholder="用户角色" class="filter-item" clearable>
+        <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" class="filter-item"/>
       </el-select>     
-      <el-button type="primary" icon="el-icon-search"  class="filter-item" @click="handleFilter">检索</el-button>
-      <el-button type="primary" icon="el-icon-edit" style="margin-left: 10px" @click="handleCreate">添加</el-button>
-      <el-button :loading="downloadLoading" type="primary" class="filter-item" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      <el-button type="primary" icon="el-icon-search"  class="filter-button" @click="handleFilter">检索</el-button>
+      <el-button type="primary" icon="el-icon-edit"  class="filter-button" @click="handleCreate">添加</el-button>
+      <el-button :loading="downloadLoading" type="primary" class="filter-button" icon="el-icon-download" @click="handleDownload">导出</el-button>
     </div>
 
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%" @sort-change="sortChange">
@@ -141,15 +141,14 @@ export default{
         this.list = response.data
         this.total = response.total
         this.listLoading = false
-
-        // 模拟请求完成后停止loading
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
       })
     },
     handleFilter(){
       this.listQuery.page = 1
+      if(this.listQuery.role === ""){ 
+        this.listQuery.role = undefined
+      }
+      console.log(this.listQuery)
       this.getList()
     },
     sortChange(data){
@@ -252,3 +251,20 @@ export default{
 }
 
 </script>
+
+<style lang="scss" scoped>
+.drug-container{
+  .filter-container{
+    display: flex;
+    justify-content: space-between;
+    padding: 3px;
+    margin: 5px 5px 5px 5px;
+    .filter-item{
+      width: 200px;
+    }
+    .filter-button{
+      margin-left: 10px;
+    }
+  }
+}
+</style>

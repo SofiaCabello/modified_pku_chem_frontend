@@ -5,6 +5,7 @@
       <el-button type="primary" icon="el-icon-search"  class="filter-item" @click="openFilter">检索</el-button>
       <el-button type="primary" icon="el-icon-edit" style="margin-left: 10px" @click="handleCreate">添加</el-button>
       <el-button :loading="downloadLoading" type="primary" class="filter-item" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      <span style="color: red; font-size: 20px; margin-left: 20px;">无货请将库存设定为-1</span>
     </div>
 
     <el-dialog title="高级检索" :visible.sync="queryFormVisible" width="50%" :close-on-click-modal="false">

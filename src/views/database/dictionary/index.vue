@@ -135,8 +135,9 @@
         </template>
       </el-select>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="handleClose(selectedTag.tagType, selectedTag.tag, selectedTag.tagName)">确 定</el-button>
+        <el-button type="primary" @click="dialogVisible = false">取 消</el-button>
+        <el-button type="warning" @click="handleDelete(selectedTag.tagType, selectedTag.tag, selectedTag.tagName)">仅 删 除</el-button>
+        <el-button type="danger" @click="handleClose(selectedTag.tagType, selectedTag.tag, selectedTag.tagName)">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -223,6 +224,19 @@ export default {
           this.inputValue = "";
         });
         mergeDictionary(this.mergeQuery).then(response => {
+          this.dialogVisible = false;
+          this.resetSelectedTag();
+          this.inputValue = "";
+        });
+      }
+    },
+    handleDelete(tags,tag,tagName){
+      const index = tags.indexOf(tag);
+      if (index >= 0) {
+        this.deleteQuery.tagType = tagName;
+        this.deleteQuery.tag = tag;
+        deleteDictionary(this.deleteQuery).then(response => {
+          tags.splice(index, 1);
           this.dialogVisible = false;
           this.resetSelectedTag();
           this.inputValue = "";

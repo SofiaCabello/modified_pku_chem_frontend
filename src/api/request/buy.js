@@ -21,3 +21,25 @@ export function postPurchaseRequest(data, token){
     }
   })
 }
+
+export function getAllBuy(query, token){
+  return request({
+    url: '/purchaseRequest/getAll',
+    method: 'get',
+    params: query,
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+}
+
+export function approveBuyRequest(query, token){
+  return request({
+    url: '/purchaseRequest/approve',
+    method: 'post',
+    params: query,
+    headers: {
+      'Authorization' : `Bearer ${token}`
+    }
+  })
+}

@@ -109,7 +109,6 @@ export default {
       rules: {
 
       },
-
       hazardTableKey: 0,
       hazardList: null,
       hazardListLoading: true,
@@ -191,11 +190,12 @@ export default {
     handleCreate(){
       let combinedString = this.tempString + this.temp.location
       this.temp.location = combinedString
-      console.log(combinedString)
+      console.log(combinedString, this.temp.location, this.tempString)
       createHazardRequest(this.temp,this.userToken).then(response => {
         this.createRequestVisible = false
         this.getHazardList()
         this.resetTemp()
+        
       })
     },
     resetTemp(){

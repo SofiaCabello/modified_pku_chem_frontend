@@ -8,9 +8,14 @@
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
+        <el-table-column label="申请人" prop="requester" sortable align="center"  :class-name="getHazardSortClass('requester')">
+        <template slot-scope="{row}">
+          <span>{{ row.user.realName }}</span>
+        </template>
+      </el-table-column>
         <el-table-column label="项目名称" prop="name" sortable align="center"  :class-name="getBuySortClass('name')">
           <template slot-scope="{row}">
-            <span>{{ row.requestDate }} 申请购买的 {{ row.drug.producer }} 制造的 {{ row.drug.specification }} 的 {{  row.drug.name }} </span>
+            <span>{{ row.drug.producer }} 制造的 {{ row.drug.specification }} 的 {{  row.drug.name }}，数量 {{ row.quantity }} </span>
           </template>
         </el-table-column>
         <el-table-column label="申请时间" prop="requestDate" sortable align="center"  :class-name="getBuySortClass('requestDate')">
@@ -21,7 +26,7 @@
         <el-table-column label="操作" align="center" width="200px">
           <template slot-scope="{row}">
             <el-button type="primary" size="small" @click="approveBuy(row.id)">审批</el-button>
-            <el-button type="danger" size="small" @click="rejectBuy(row.id)">驳回</el-button>+
+            <el-button type="danger" size="small" @click="rejectBuy(row.id)">驳回</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -39,6 +44,11 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="申请人" prop="requester" sortable align="center"  :class-name="getHazardSortClass('requester')">
+        <template slot-scope="{row}">
+          <span>{{ row.user.realName }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="项目名称" prop="name" sortable align="center"  :class-name="getHazardSortClass('name')">
         <template slot-scope="{row}">
             <span>位于 {{ row.location }} 的 {{ row.type }}</span>
@@ -51,8 +61,8 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="200px">
           <template slot-scope="{row}">
-            <el-button type="primary" size="small" @click="approveBuy(row.id)">审批</el-button>
-            <el-button type="danger" size="small" @click="rejectBuy(row.id)">驳回</el-button>+
+            <el-button type="primary" size="small" @click="approveHazard(row.id)">审批</el-button>
+            <el-button type="danger" size="small" @click="rejectHazard(row.id)">驳回</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -63,6 +73,8 @@
 
 <script>
 import Pagination from '@/components/Pagination/index.vue'
+import { getAllBuy, approveBuyRequest} from '@/api/request/buy'
+import { getAllHazard, approveHazardRequest } from '@/api/request/hazard';
 
 export default {
   name: "approve",
@@ -87,16 +99,29 @@ export default {
         limit: 10,
       },
       hazardTableKey: 0,
+      requestQuery: {
+        requestId: '',
+      }
     };
   },
   created() {
+    this.getBuyList()
+    this.getHazardList()
   },
   methods: {
     getBuyList() {
+      getAllBuy(this.buyQuery).then(res => {
+        this.buyList = res.data;
+        this.buyTotal = res.total;
+      })
     },
     buySortChange() {
     },
     getHazardList() {
+      getAllHazard(this.hazardQuery).then(res => {
+        this.hazardList = res.data;
+        this.hazardTotal = res.total;
+      })
     },
     hazardSortChange() {
     },
@@ -104,6 +129,18 @@ export default {
     },
     getHazardSortClass() {
     },
+    approveBuy(id) {
+      this.requestQuery.requestId = id
+      approveBuyRequest(this.requestQuery, this.$store.token).then(res => {
+        this.getBuyList()
+      })
+    },
+    rejectBuy(id) {
+    },
+    approveHazard(id) {
+    },
+    rejectHazard(id) {
+    }
   }
 };
 </script>
