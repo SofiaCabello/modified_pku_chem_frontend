@@ -67,16 +67,6 @@ export const constantRoutes = [
       }
     ]
   },
-  {
-    path: 'external-link',
-    component: Layout,
-    children: [
-      {
-        path: 'https://github.com/SofiaCabello/DatabaseFrontend',
-        meta: { title: 'GitHub', icon: 'link' }
-      }
-    ]
-  },
 ]
 
 export const asyncRoutes = [
@@ -110,6 +100,12 @@ export const asyncRoutes = [
         name: '选项管理',
         component: () => import('@/views/database/dictionary/index'),
         meta: { title: '选项管理', icon: 'table',roles: ['admin']} 
+      },
+      {
+        path: 'approve',
+        name: '申请审批',
+        component: () => import('@/views/database/approve/index'),
+        meta: { title: '申请审批', icon: 'table', roles: ['admin']}
       }
     ]
   },

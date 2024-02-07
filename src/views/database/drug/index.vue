@@ -60,7 +60,7 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="试剂名" prop="name" sortable="custom" width="120" align="center" :class-name="getSortClass('name')">
+      <el-table-column label="试剂名" prop="name" width="120" align="center" :class-name="getSortClass('name')">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
@@ -70,12 +70,12 @@
           <span>{{ row.nickName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="厂家 & 品牌" prop="producer" sortable="custom" width="150" align="center" :class-name="getSortClass('producer')">
+      <el-table-column label="厂家 & 品牌" prop="producer" width="150" align="center" :class-name="getSortClass('producer')">
         <template slot-scope="{row}">
           <span>{{ row.producer }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="位置" prop="location"  sortable="custom" width="150" align="center" :class-name="getSortClass('location')">
+      <el-table-column label="位置" prop="location"  width="150" align="center" :class-name="getSortClass('location')">
         <template slot-scope="{row}">
           <span>{{ row.location }}</span>
         </template>
@@ -100,7 +100,7 @@
           <span>{{ row.cas }}</span>
         </template>
       </el-table-column>
-    <el-table-column label="网址" prop="url" width="120" align="center" sortable="custom" :class-name="getSortClass('url')">
+    <el-table-column label="网址" prop="url" width="120" align="center" :class-name="getSortClass('url')">
       <template slot-scope="{row}">
         <span>{{ row.url }}</span>
       </template>"
@@ -238,7 +238,14 @@ export default{
         stock: undefined,
       },
       purchaseVisible: false,
-      sortOptions:[{label:'编号升序',key:'+id'},{label:'编号降序',key:'-id'}],
+      sortOptions:[
+        {label:'编号升序',key:'+id'},
+        {label:'编号降序',key:'-id'},
+        {label:'库存升序',key:'+stock'},
+        {label:'库存降序',key:'-stock'},
+        {label:'别名升序',key:'+nickName'},
+        {label:'别名降序',key:'-nickName'},
+      ],
       temp: {
         id: undefined,
         name: '',
@@ -306,10 +313,14 @@ export default{
         this.sortByID(order)
       }if(prop === 'stock'){
         this.sortByStock(order)
-      }if(prop === 'priceOut'){
-        this.sortBypriceOut(order)
-      }if(prop === 'priceIn'){
-        this.sortBypriceIn(order)
+      }if(prop === 'nickName'){
+        this.sortByNickName(order)
+      }if(prop === 'specification'){
+        this.sortBySpecification(order)
+      }if(prop === 'formula'){
+        this.sortByFormula(order)
+      }if(prop === 'cas'){
+        this.sortByCas(order)
       }
     },
     sortByID(order){
@@ -328,19 +339,35 @@ export default{
       }
       this.getList()
     },
-    sortBypriceOut(order){
+    sortByNickName(order){
       if(order === 'ascending'){
-        this.listQuery.sort = '+priceOut'
+        this.listQuery.sort = '+nickName'
       }else{
-        this.listQuery.sort = '-priceOut'
+        this.listQuery.sort = '-nickName'
       }
       this.getList()
     },
-    sortBypriceIn(order){
+    sortBySpecification(order){
       if(order === 'ascending'){
-        this.listQuery.sort = '+priceIn'
+        this.listQuery.sort = '+specification'
       }else{
-        this.listQuery.sort = '-priceIn'
+        this.listQuery.sort = '-specification'
+      }
+      this.getList()
+    },
+    sortByFormula(order){
+      if(order === 'ascending'){
+        this.listQuery.sort = '+formula'
+      }else{
+        this.listQuery.sort = '-formula'
+      }
+      this.getList()
+    },
+    sortByCas(order){
+      if(order === 'ascending'){
+        this.listQuery.sort = '+cas'
+      }else{
+        this.listQuery.sort = '-cas'
       }
       this.getList()
     },
@@ -367,7 +394,7 @@ export default{
     createData(){
       this.$refs['dataForm'].validate((valid) => {
         if(valid){
-          let combinedString = this.tempString + this.temp.location
+          let combinedString = this.tempString + this.locationDisplay
           this.temp.location = combinedString
           const tempData = Object.assign({},this.temp)
           createDrug(tempData).then(() => {
@@ -390,7 +417,7 @@ export default{
     updateData(){
         this.$refs['dataForm'].validate((valid) => {
           if(valid){
-            let combinedString = this.tempString + this.temp.location
+            let combinedString = this.tempString + this.locationDisplay
             this.temp.location = combinedString
             const tempData = Object.assign({},this.temp)
             updateDrug(tempData).then(() => {
@@ -420,8 +447,8 @@ export default{
     handleDownload(){
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel =>{
-        const tHeader = ['药物编号','药物名称','药物类型','生产厂家','药物描述','药物存量','药物售价','药物进价']
-        const filterVal = ['id','name','type','manufacturer','description','stock','priceOut','priceIn']
+        const tHeader = ['试剂ID','试剂名','别名','厂家 & 品牌','位置','规格','库存','化学式','CAS','网址']
+        const filterVal = ['id','name','nickName','producer','location','specification','stock','formula','cas','url']
         const list = this.formatJson(filterVal)
         excel.export_json_to_excel({
           header: tHeader,

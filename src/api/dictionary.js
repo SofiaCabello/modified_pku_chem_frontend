@@ -43,3 +43,11 @@ export function addDictionary(query){
     params: query
   })
 }
+
+export function mergeDictionary(query){
+  return request({
+    url: '/dictionary/merge',
+    method: 'post',
+    params: query
+  })
+}

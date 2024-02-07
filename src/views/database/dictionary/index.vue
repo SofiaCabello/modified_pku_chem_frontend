@@ -7,7 +7,7 @@
         v-for="tag in tagList.producerTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.producerTags,tag,'producerTags')"
+        @close="openDialog(tagList.producerTags,tag,'producerTags')"
       >
         {{ tag }}
       </el-tag>
@@ -31,7 +31,7 @@
         v-for="tag in tagList.labTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.labTags, tag, 'labTags')"
+        @close="openDialog(tagList.labTags, tag, 'labTags')"
       >
         {{ tag }}
       </el-tag>
@@ -55,7 +55,7 @@
         v-for="tag in tagList.locationTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.locationTags, tag, 'locationTags')"
+        @close="openDialog(tagList.locationTags, tag, 'locationTags')"
       >
         {{ tag }}
       </el-tag>
@@ -79,7 +79,7 @@
         v-for="tag in tagList.sourceTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.sourceTags, tag, 'sourceTags')"
+        @close="openDialog(tagList.sourceTags, tag, 'sourceTags')"
       >
         {{ tag }}
       </el-tag>
@@ -103,7 +103,7 @@
         v-for="tag in tagList.wasteTags"
         closable
         :disable-transitions="false"
-        @close="handleClose(tagList.wasteTags, tag, 'wasteTags')"
+        @close="openDialog(tagList.wasteTags, tag, 'wasteTags')"
       >
         {{ tag }}
       </el-tag>
@@ -119,16 +119,42 @@
       </el-input>
       <el-button v-else class="button-new-tag" size="small" @click="showInput('wasteTags')">+ New Tag</el-button>
     </div>
+
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%" center>
+      <span>选择并入的标签</span>
+      <!-- 警告语句 -->
+      <span style="color: red; margin-left: 10px;">警告：合并操作会影响全局相应数据项！</span>
+      <el-select v-model="inputValue" placeholder="请选择" style="width: 100%; margin-top: 5px;">
+        <template v-for="item in selectedTag.tagType">
+          <el-option
+            v-if="item !== selectedTag.tag"
+            :key="item"
+            :label="item"
+            :value="item"
+          ></el-option>
+        </template>
+      </el-select>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleClose(selectedTag.tagType, selectedTag.tag, selectedTag.tagName)">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getDictionary, deleteDictionary, addDictionary } from '@/api/dictionary';
+import { getDictionary, deleteDictionary, addDictionary, mergeDictionary } from '@/api/dictionary';
 
 export default {
   name: "dictionary",
   data() {
     return {
+      selectedTag:{
+        tagType: "",
+        tag: "",
+        tagName: "",
+      },
+      dialogVisible: false,
       tagList:{
         producerTags: [],
         labTags: [],
@@ -158,20 +184,48 @@ export default {
       deleteQuery: {
         tagType: "",
         tag: "",
-      }
+      },
+      mergeQuery: {
+        tagType: "",
+        tag: "",
+        targetTag: "",
+      },
     };
   },
   created() {
     this.initTags()
   },
   methods: {
+    openDialog(tagType,tag,tagName){
+      this.selectedTag.tagType = tagType;
+      this.selectedTag.tag = tag;
+      this.selectedTag.tagName = tagName;
+      console.log(this.selectedTag);
+      this.dialogVisible = true;
+    },
+    resetSelectedTag(){
+      this.selectedTag.tagType = "";
+      this.selectedTag.tag = "";
+      this.selectedTag.tagName = "";
+    },
     handleClose(tags,tag,tagName) {
       const index = tags.indexOf(tag);
       if (index >= 0) {
         this.deleteQuery.tagType = tagName;
         this.deleteQuery.tag = tag;
+        this.mergeQuery.tagType = tagName;
+        this.mergeQuery.tag = tag;
+        this.mergeQuery.targetTag = this.inputValue;
         deleteDictionary(this.deleteQuery).then(response => {
           tags.splice(index, 1);
+          this.dialogVisible = false;
+          this.resetSelectedTag();
+          this.inputValue = "";
+        });
+        mergeDictionary(this.mergeQuery).then(response => {
+          this.dialogVisible = false;
+          this.resetSelectedTag();
+          this.inputValue = "";
         });
       }
     },
