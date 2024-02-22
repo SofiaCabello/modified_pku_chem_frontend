@@ -88,7 +88,8 @@
       </el-table-column>
       <el-table-column label="库存" prop="stock" width="60" align="center" sortable="custom" :class-name="getSortClass('stock')">
         <template slot-scope="{row}">
-          <span>{{ row.stock }}</span>
+          <span v-if="row.stock > 0">有货</span>
+          <span v-else>-1</span>
         </template>
       </el-table-column>
       <el-table-column label="化学式" prop="formula" width="120" align="center" sortable="custom" :class-name="getSortClass('formula')">
@@ -106,10 +107,13 @@
         <span>{{ row.url }}</span>
       </template>"
     </el-table-column>
-      <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="400px" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
           <el-button type="primary" size="mini" @click="purchaseVisible = true; purchaseTemp = row">
             购买申请
+          </el-button>
+          <el-button type="info" size="mini" @click="recordVisible = true">
+            购买记录
           </el-button>
           <el-button type="warning" size="mini" @click="handleUpdate(row)">
             编辑
@@ -141,7 +145,7 @@
       <div slot="footer" class="dialog-footer">
           <el-button @click="purchaseVisible = false">取 消</el-button>
           <el-button type="primary" @click="handlePurchaseRequest">确 定</el-button>
-        </div>
+      </div>
     </el-dialog>
 
     <!--分页器-->
@@ -280,6 +284,7 @@ export default{
         sourceTags: [],
         wasteTags: [],
       },
+      purchaseVisible: false,
     }
   },
   created() {
