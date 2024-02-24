@@ -43,3 +43,25 @@ export function approveBuyRequest(query, token){
     }
   })
 }
+
+export function rejectBuyRequest(query, token){
+  return request({
+    url: '/purchaseRequest/reject',
+    method: 'post',
+    params: query,
+    headers: {
+      'Authorization' : `Bearer ${token}`
+    }
+  })
+}
+
+export function setBuyRead(query, token){
+  return request({
+    url: '/purchaseRequest/setRead',
+    method: 'post',
+    params: query,
+    headers: {
+      'Authorization' : `Bearer ${token}`
+    }
+  })
+}

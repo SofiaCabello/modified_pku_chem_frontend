@@ -46,27 +46,8 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: '仪表盘', icon: 'dashboard' }
-    }]
-  },
-
-  {
-    path: '/profile',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: '个人中心',
-        component: () => import('@/views/profile/index'),
-        meta: { title: '个人中心', icon: 'user' }
-      }
-    ]
-  },
+    redirect: '/database/drug',
+  }
 ]
 
 export const asyncRoutes = [

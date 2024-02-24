@@ -11,12 +11,23 @@
         </el-table-column>
         <el-table-column label="项目名称" prop="name" sortable align="center"  :class-name="getBuySortClass('name')">
           <template slot-scope="{row}">
-            <span>{{ row.requestDate }} 申请购买的 {{ row.drug.producer }} 制造的 {{ row.drug.specification }} 的 {{  row.drug.name }} </span>
+            <span>{{ row.requestDate }} 申请购买的 {{ row.drug.producer }} 制造的 {{ row.drug.specification }} 的 {{  row.drug.name }}，数量 {{ row.quantity }}</span>
           </template>
         </el-table-column>
         <el-table-column label="申请时间" prop="requestDate" sortable align="center"  :class-name="getBuySortClass('requestDate')">
           <template slot-scope="{row}">
             <span>{{ row.requestDate }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" prop="status" sortable align="center"  :class-name="getBuySortClass('status')">
+          <template slot-scope="{row}">
+            <span v-if="row.status === 'pending'" style="color: #FFA500">待处理</span>
+            <span v-else-if="row.status === 'approved'" style="color: #32CD32">
+              已批准<el-button type="primary" size="mini" style="margin-left: 5px;" @click="handleBuyRead(row)">标记为已读</el-button>
+            </span>
+            <span v-else-if="row.status === 'rejected'" style="color: #FF0000">
+              被驳回<el-button type="primary" size="mini" style="margin-left: 5px;" @click="handleBuyRead(row)">标记为已读</el-button>
+            </span>
           </template>
         </el-table-column>
       </el-table>
@@ -45,7 +56,18 @@
           <span>{{ row.requestDate }}</span>
         </template>
       </el-table-column>
-      </el-table>
+      <el-table-column label="状态" prop="status" sortable align="center"  :class-name="getHazardSortClass('status')">
+        <template slot-scope="{row}">
+          <span v-if="row.status === 'pending'" style="color: #FFA500">待处理</span>
+          <span v-else-if="row.status === 'approved'" style="color: #32CD32">
+            已批准<el-button type="primary" size="mini" style="margin-left: 5px;" @click="handleHazardRead(row)">标记为已读</el-button>
+          </span>
+          <span v-else-if="row.status === 'rejected'" style="color: #FF0000">
+            被驳回<el-button type="primary" size="mini" style="margin-left: 5px;" @click="handleHazardRead(row)">标记为已读</el-button>
+          </span>
+        </template>
+      </el-table-column>  
+    </el-table>
       <pagination v-show="hazardTotal>0" :total="hazardTotal" :page.sync="hazardQuery.page" :limit.sync="hazardQuery.limit" @pagination="getHazardList" />
       
       <el-dialog title="新建申请" :visible.sync="createRequestVisible" width="50%" :close-on-click-modal="false">
@@ -79,8 +101,8 @@
 </template>
 
 <script>
-import { getListBuy } from '@/api/request/buy.js'
-import { getListHazard, createHazardRequest } from '@/api/request/hazard.js'
+import { getListBuy, setBuyRead } from '@/api/request/buy.js'
+import { getListHazard, createHazardRequest, setHazardRead } from '@/api/request/hazard.js'
 import { mapGetters } from 'vuex'
 import { getWasteDictionary, getLocationDictionary, getLabDictionary } from '@/api/dictionary.js'
 import Pagination from '@/components/Pagination/index.vue'
@@ -106,8 +128,8 @@ export default {
         limit: 20,
         sort: '-id',
       },
-      rules: {
-
+      buyReadQuery: {
+        requestId: 0,
       },
       hazardTableKey: 0,
       hazardList: null,
@@ -117,6 +139,9 @@ export default {
         page: 1,
         limit: 20,
         sort: '-id',
+      },
+      hazardReadQuery: {
+        requestId: 0,
       },
       createRequestVisible: false,
       tempString: '',
@@ -196,6 +221,18 @@ export default {
         this.getHazardList()
         this.resetTemp()
         
+      })
+    },
+    handleBuyRead(row){
+      this.buyReadQuery.requestId = row.id
+      setBuyRead(this.buyReadQuery, this.$store.token).then(response => {
+        this.getBuyList()
+      })
+    },
+    handleHazardRead(row){
+      this.hazardReadQuery.requestId = row.id
+      setHazardRead(this.hazardReadQuery, this.$store.token).then(response => {
+        this.getHazardList()
       })
     },
     resetTemp(){

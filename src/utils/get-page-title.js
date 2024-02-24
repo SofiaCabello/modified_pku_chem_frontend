@@ -1,6 +1,6 @@
 import defaultSettings from '@/settings'
 
-const title = defaultSettings.title || '医药商店数据管理系统'
+const title = defaultSettings.title || 'RESIM@PKU'
 
 export default function getPageTitle(pageTitle) {
   if (pageTitle) {

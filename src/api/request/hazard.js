@@ -33,11 +33,33 @@ export function getAllHazard(query, token){
   })
 }
 
-export function approveHazardRequest(data, token){
+export function approveHazardRequest(query, token){
   return request({
     url: '/hazardRequest/approve',
     method: 'post',
-    data: data,
+    params: query,
+    headers: {
+      'Authorization' : `Bearer ${token}`
+    }
+  })
+}
+
+export function rejectHazardRequest(query, token){
+  return request({
+    url: '/hazardRequest/reject',
+    method: 'post',
+    params: query,
+    headers: {
+      'Authorization' : `Bearer ${token}`
+    }
+  })
+}
+
+export function setHazardRead(query, token){
+  return request({
+    url: '/hazardRequest/setRead',
+    method: 'post',
+    params: query,
     headers: {
       'Authorization' : `Bearer ${token}`
     }

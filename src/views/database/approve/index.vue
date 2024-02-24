@@ -8,7 +8,7 @@
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="申请人" prop="requester" sortable align="center"  :class-name="getHazardSortClass('requester')">
+        <el-table-column label="申请人" prop="realName" sortable align="center"  :class-name="getHazardSortClass('requester')">
         <template slot-scope="{row}">
           <span>{{ row.user.realName }}</span>
         </template>
@@ -44,7 +44,7 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="申请人" prop="requester" sortable align="center"  :class-name="getHazardSortClass('requester')">
+      <el-table-column label="申请人" prop="realName" sortable align="center"  :class-name="getHazardSortClass('requester')">
         <template slot-scope="{row}">
           <span>{{ row.user.realName }}</span>
         </template>
@@ -73,8 +73,8 @@
 
 <script>
 import Pagination from '@/components/Pagination/index.vue'
-import { getAllBuy, approveBuyRequest} from '@/api/request/buy'
-import { getAllHazard, approveHazardRequest } from '@/api/request/hazard';
+import { getAllBuy, approveBuyRequest, rejectBuyRequest} from '@/api/request/buy'
+import { getAllHazard, approveHazardRequest, rejectHazardRequest } from '@/api/request/hazard';
 
 export default {
   name: "approve",
@@ -136,10 +136,22 @@ export default {
       })
     },
     rejectBuy(id) {
+      this.requestQuery.requestId = id
+      rejectBuyRequest(this.requestQuery, this.$store.token).then(res => {
+        this.getBuyList()
+      })
     },
     approveHazard(id) {
+      this.requestQuery.requestId = id
+      approveHazardRequest(this.requestQuery, this.$store.token).then(res => {
+        this.getHazardList()
+      })
     },
     rejectHazard(id) {
+      this.requestQuery.requestId = id
+      rejectHazardRequest(this.requestQuery, this.$store.token).then(res => {
+        this.getHazardList()
+      })
     }
   }
 };

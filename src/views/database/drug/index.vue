@@ -5,27 +5,24 @@
       <el-button type="primary" icon="el-icon-search"  class="filter-item" @click="openFilter">检索</el-button>
       <el-button type="primary" icon="el-icon-edit" style="margin-left: 10px" @click="handleCreate">添加</el-button>
       <el-button :loading="downloadLoading" type="primary" class="filter-item" icon="el-icon-download" @click="handleDownload">导出</el-button>
-      <span style="color: red; font-size: 20px; margin-left: 20px;">无货请将库存设定为-1</span>
     </div>
 
     <el-dialog title="高级检索" :visible.sync="queryFormVisible" width="50%" :close-on-click-modal="false">
       <el-form ref="queryForm" :model="listQuery" label-width="100px" size="mini">
-        <el-form-item label="试剂名" prop="name">
-          <el-input v-model="listQuery.name" placeholder="请输入试剂名"></el-input>
+        <el-form-item label="试剂名/别名" prop="name">
+          <el-input v-model="listQuery.name" placeholder="请输入试剂名/别名"></el-input>
         </el-form-item>
         <el-form-item label="试剂ID" prop="id">
           <el-input v-model="listQuery.id" placeholder="请输入试剂ID"></el-input>
         </el-form-item>
         <el-form-item label="厂家 & 品牌" prop="producer">
-          <el-select v-model="listQuery.producer" placeholder="请选择厂家 & 品牌" style="width: 100%" class="filter-item">
+          <el-select v-model="listQuery.producer" placeholder="请选择厂家 & 品牌" style="width: 80%" class="filter-item">
             <el-option v-for="item in tagList.producerTags" :key="item" :label="item" :value="item"/>
           </el-select>
+          <el-button style="width: 15%; margin-left: 10px;" @click="listQuery.producer = ''">重置</el-button>
         </el-form-item>
         <el-form-item label="规格" prop="specification">
           <el-input v-model="listQuery.specification" placeholder="请输入规格"></el-input>
-        </el-form-item>
-        <el-form-item label="别名" prop="nickName">
-          <el-input v-model="listQuery.nickName" placeholder="请输入别名"></el-input>
         </el-form-item>
         <el-form-item label="化学式" prop="formula">
           <el-input v-model="listQuery.formula" placeholder="请输入化学式"></el-input>
@@ -34,18 +31,26 @@
           <el-input v-model="listQuery.cas" placeholder="请输入cas"></el-input>
         </el-form-item>
         <el-form-item label="位置" prop="location">
-          <el-select v-model="tempString" placeholder="请选择实验室" style="width: 50%" class="filter-item">
+          <el-select v-model="listQuery.lab" placeholder="选择实验室" style="width: 30%" class="filter-item">
             <el-option v-for="item in tagList.labTags" :key="item" :label="item" :value="item"/>
           </el-select>
-          <el-select v-model="listQuery.location" placeholder="请选择存储位置" style="width: 50%" class="filter-item">
+          <el-select v-model="listQuery.location" placeholder="选择存储位置" style="width: 30%; margin-left: 10px" class="filter-item">
             <el-option v-for="item in tagList.locationTags" :key="item" :label="item" :value="item"/>
           </el-select>
+          <span>
+            第<el-input v-model="listQuery.layer" style="width: 10%;"></el-input>层
+          </span>
+          <el-button style="width: 15%; margin-left: 10px;" @click="listQuery.lab = ''; listQuery.location = ''; listQuery.layer = ''">重置</el-button>
         </el-form-item>
         <el-form-item label="网址" prop="url">
           <el-input v-model="listQuery.url" placeholder="请输入网址"></el-input>
         </el-form-item>
         <el-form-item label="库存" prop="stock">
-          <el-input v-model="listQuery.stock" placeholder="请输入库存"></el-input>
+          <el-select v-model="listQuery.stock" placeholder="请选择库存" style="width: 80%" class="filter-item">
+            <el-option label="有货" value="in_stock"></el-option>
+            <el-option label="无货" value="out_of_stock"></el-option>
+          </el-select>
+          <el-button style="width: 15%; margin-left:10px" @click="listQuery.stock = ''">重置</el-button>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -66,7 +71,7 @@
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="别名" prop="nickName" sortable="custom" width="120" align="center" :class-name="getSortClass('nickName')">
+      <el-table-column label="别名" prop="nickName" width="120" align="center" :class-name="getSortClass('nickName')">
         <template slot-scope="{row}">
           <span>{{ row.nickName }}</span>
         </template>
@@ -78,7 +83,8 @@
       </el-table-column>
       <el-table-column label="位置" prop="location"  width="150" align="center" :class-name="getSortClass('location')">
         <template slot-scope="{row}">
-          <span>{{ row.location }}</span>
+          <span v-if="row.layer">{{ row.lab }}{{ row.location }}第{{ row.layer }}层</span>
+          <span v-else>{{ row.lab }}{{ row.location }}</span>
         </template>
       </el-table-column>
       <el-table-column label="规格" prop="specification" sortable="custom" width="120" align="center" :class-name="getSortClass('specification')">
@@ -88,8 +94,8 @@
       </el-table-column>
       <el-table-column label="库存" prop="stock" width="60" align="center" sortable="custom" :class-name="getSortClass('stock')">
         <template slot-scope="{row}">
-          <span v-if="row.stock > 0">有货</span>
-          <span v-else>-1</span>
+          <span v-if="row.stock === 'in_stock'">有货</span>
+          <span v-else>无货</span>
         </template>
       </el-table-column>
       <el-table-column label="化学式" prop="formula" width="120" align="center" sortable="custom" :class-name="getSortClass('formula')">
@@ -152,7 +158,7 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="90px" style="width: 400px; margin-left: 50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="90px" style="margin-left: 30px; margin-right: 30px;">
         <el-form-item label="试剂名" prop="name">
           <el-input v-model="temp.name" placeholder="请输入试剂名"></el-input>
         </el-form-item>
@@ -165,18 +171,24 @@
           </el-select>
         </el-form-item>
         <el-form-item label="位置" prop="location">
-          <el-select v-model="tempString" placeholder="请选择实验室" style="width: 50%" class="filter-item">
+          <el-select v-model="temp.lab" placeholder="选择实验室" style="width: 35%" class="filter-item">
             <el-option v-for="item in tagList.labTags" :key="item" :label="item" :value="item"/>
           </el-select>
-          <el-select v-model="locationDisplay" placeholder="请选择存储位置" style="width: 50%" class="filter-item">
+          <el-select v-model="temp.location" placeholder="选择存储位置" style="width: 35%" class="filter-item">
             <el-option v-for="item in tagList.locationTags" :key="item" :label="item" :value="item"/>
           </el-select>
+          <span style="width: 30%;">
+            第<el-input v-model="temp.layer" style="width: 50px"></el-input>层
+          </span>
         </el-form-item>
         <el-form-item label="规格" prop="specification">
           <el-input v-model="temp.specification" placeholder="请输入规格"></el-input>
         </el-form-item>
         <el-form-item label="库存" prop="stock">
-          <el-input v-model="temp.stock" placeholder="请输入库存"></el-input>
+          <el-select v-model="stockDisplay" placeholder="请选择库存" style="width: 100%" class="filter-item">
+            <el-option label="有货" value="in_stock"></el-option>
+            <el-option label="无货" value="out_of_stock"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="化学式" prop="formula">
           <el-input v-model="temp.formula" placeholder="请输入化学式"></el-input>
@@ -206,12 +218,12 @@ export default{
   name:'drugTable',
   components:{ Pagination },
   computed:{
-    locationDisplay: {
+    stockDisplay: {
       get(){
-        return this.listQuery.location === undefined ? '' : this.listQuery.location
+        return this.temp.stock === 'in_stock' ? '有货' : '无货'
       },
       set(val){
-        this.listQuery.location = val
+        this.temp.stock = val
       }
     }
   },
@@ -226,7 +238,6 @@ export default{
       list: null,
       total: 0,
       listLoading: true,
-      tempString: '',
       listQuery: {
         page: 1,
         limit: 10,
@@ -238,7 +249,9 @@ export default{
         nickName: undefined,
         formula: undefined,
         cas: undefined,
+        lab: undefined,
         location: undefined,
+        layer: undefined,
         url: undefined,
         stock: undefined,
       },
@@ -259,7 +272,9 @@ export default{
         nickName: '',
         formula: '',
         cas: '',
+        lab: '',
         location: '',
+        layer: '',
         url: '',
         stock: '',
       },
@@ -293,7 +308,6 @@ export default{
   },
   methods:{
     getList(){
-      this.listQuery.location = ''
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
         this.list = response.data
@@ -305,12 +319,9 @@ export default{
       this.queryFormVisible = true
     },
     handleFilter(){
-      let combinedString = this.tempString + this.listQuery.location
-      this.listQuery.location = combinedString
       this.listQuery.page = 1
       this.getList()
       // reset temp
-      this.tempString = ''
       this.queryFormVisible = false
     },
     sortChange(data){
@@ -381,12 +392,16 @@ export default{
       this.temp = {
         id: undefined,
         name: '',
-        type: '',
-        manufacturer: '',
-        description: '',
+        producer: '',
+        specification: '',
+        nickName: '',
+        formula: '',
+        cas: '',
+        lab: '',
+        location: '',
+        layer: '',
+        url: '',
         stock: '',
-        priceOut: '',
-        priceIn: '',
       }
     },
     handleCreate(){
@@ -400,14 +415,11 @@ export default{
     createData(){
       this.$refs['dataForm'].validate((valid) => {
         if(valid){
-          let combinedString = this.tempString + this.locationDisplay
-          this.temp.location = combinedString
           const tempData = Object.assign({},this.temp)
           createDrug(tempData).then(() => {
             this.getList()
             this.dialogFormVisible = false
             this.resetTemp()
-            this.tempString = ''
           })
         }
       })
@@ -423,15 +435,12 @@ export default{
     updateData(){
         this.$refs['dataForm'].validate((valid) => {
           if(valid){
-            let combinedString = this.tempString + this.locationDisplay
-            this.temp.location = combinedString
             const tempData = Object.assign({},this.temp)
             updateDrug(tempData).then(() => {
               const index = this.list.findIndex(v => v.id === this.temp.id)
               this.list.splice(index,1,this.temp)
               this.dialogFormVisible = false
             })
-            this.tempString = ''
           }
         })
     },
