@@ -111,24 +111,29 @@
     <el-table-column label="网址" prop="url" width="120" align="center" :class-name="getSortClass('url')">
       <template slot-scope="{row}">
         <span>{{ row.url }}</span>
-      </template>"
+      </template>
     </el-table-column>
-      <el-table-column label="操作" align="center" width="400px" class-name="small-padding fixed-width">
-        <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="purchaseVisible = true; purchaseTemp = row">
-            购买申请
-          </el-button>
-          <el-button type="info" size="mini" @click="recordVisible = true">
-            购买记录
-          </el-button>
-          <el-button type="warning" size="mini" @click="handleUpdate(row)">
-            编辑
-          </el-button>
-          <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
-            删除
-          </el-button>
-        </template>
-      </el-table-column>
+    <el-table-column label="备注" prop="note" width="120" align="center">
+      <template slot-scope="{row}">
+        <span>{{ row.note }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column label="操作" align="center" width="400px" class-name="small-padding fixed-width">
+      <template slot-scope="{row,$index}">
+        <el-button type="primary" size="mini" @click="purchaseVisible = true; purchaseTemp = row">
+          购买申请
+        </el-button>
+        <el-button type="info" size="mini" @click="recordVisible = true">
+          购买记录
+        </el-button>
+        <el-button type="warning" size="mini" @click="handleUpdate(row)">
+          编辑
+        </el-button>
+        <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
+          删除
+        </el-button>
+      </template>
+    </el-table-column>
     </el-table>
 
     <el-dialog title="购买申请" :visible.sync="purchaseVisible">
@@ -198,6 +203,9 @@
         </el-form-item>
         <el-form-item label="网址" prop="url">
           <el-input v-model="temp.url" placeholder="请输入网址"></el-input>
+        </el-form-item>
+        <el-form-item label="备注" prop="note">
+          <el-input v-model="temp.note" placeholder="请输入备注"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -277,6 +285,7 @@ export default{
         layer: '',
         url: '',
         stock: '',
+        note: '',
       },
       purchaseTemp: {
         drug_id: undefined,
@@ -402,6 +411,7 @@ export default{
         layer: '',
         url: '',
         stock: '',
+        note: '',
       }
     },
     handleCreate(){
