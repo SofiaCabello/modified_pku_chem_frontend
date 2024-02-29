@@ -8,6 +8,16 @@ export function login(data) {
   })
 }
 
+export function getRole(token){
+  return request({
+    url: '/user/getRole',
+    method: 'get',
+    headers: {
+      'Authorization' : `Bearer ${token}`
+    }
+  })
+}
+
 export function getInfo(token) {
   return request({
     url: '/login/userInfo',

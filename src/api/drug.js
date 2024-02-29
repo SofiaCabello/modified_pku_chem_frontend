@@ -46,9 +46,11 @@ export function getEchart(){
   })
 }
 
-export function getProfit(){
+
+export function getRecord(query){
   return request({
-    url: '/drug/setProfitData',
-    method: 'get'
+    url: '/drug/getRecord',
+    method: 'get',
+    params: query
   })
 }

@@ -5,6 +5,10 @@
       <el-button type="primary" icon="el-icon-search"  class="filter-item" @click="openFilter">检索</el-button>
       <el-button type="primary" icon="el-icon-edit" style="margin-left: 10px" @click="handleCreate">添加</el-button>
       <el-button :loading="downloadLoading" type="primary" class="filter-item" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      <span v-if="isAdmin" style="margin-left: 10px">
+        <el-button type="primary" icon="el-icon-upload2" class="filter-item" @click="handleUpload">导入</el-button>
+        <el-button type="primary" icon="el-icon-document" class="filter-item" @click="getUploadTemplate">模板</el-button>
+      </span>
     </div>
 
     <el-dialog title="高级检索" :visible.sync="queryFormVisible" width="50%" :close-on-click-modal="false">
@@ -118,7 +122,7 @@
           <el-button type="primary" size="mini" @click="purchaseVisible = true; purchaseTemp = row">
             购买申请
           </el-button>
-          <el-button type="info" size="mini" @click="recordVisible = true">
+          <el-button type="info" size="mini" @click="handleRecord(row)">
             购买记录
           </el-button>
           <el-button type="warning" size="mini" @click="handleUpdate(row)">
@@ -130,6 +134,37 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog title="购买记录" :visible.sync="recordVisible">
+      <el-table :data="recordList" border fit highlight-current-row style="width: 100%">
+        <el-table-column label="购买ID" prop="id" align="center" width="80">
+          <template slot-scope="{row}">
+            <span>{{ row.id }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="购买渠道" prop="source" align="center">
+          <template slot-scope="{row}">
+            <span>{{ row.source }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="购买数量" prop="quantity" align="center">
+          <template slot-scope="{row}">
+            <span>{{ row.quantity }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="批准日期" prop="date" align="center">
+          <template slot-scope="{row}">
+            <span>{{ row.approveDate }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="购买人" prop="buyer" align="center">
+          <template slot-scope="{row}">
+            <span>{{ row.buyer }}</span>
+          </template>
+
+        </el-table-column>
+      </el-table>
+    </el-dialog>
 
     <el-dialog title="购买申请" :visible.sync="purchaseVisible">
       <el-form ref="dataForm" :model="purchaseTemp" label-position="left" label-width="180px" style="width: 400px; margin-left: 50px;">
@@ -210,9 +245,11 @@
 
 <script>
 import Pagination from '@/components/Pagination/index'
+import { getRole } from '@/api/user'
 import { postPurchaseRequest } from '@/api/request/buy'
-import { fetchList, updateDrug, createDrug, deleteDrug } from '@/api/drug'
+import { fetchList, updateDrug, createDrug, deleteDrug, getRecord } from '@/api/drug'
 import { getDictionary } from '@/api/dictionary'
+import XLSX from 'xlsx';
 
 export default{
   name:'drugTable',
@@ -300,11 +337,22 @@ export default{
         wasteTags: [],
       },
       purchaseVisible: false,
+      recordVisible: false,
+      recordList: null,
+      recordQuery:{
+        page: 1,
+        limit: 10,
+        sort:'+id',
+        id: undefined,
+      },
+      currentName: '',
+      isAdmin: false,
     }
   },
   created() {
     this.getList()
     this.initTags()
+    this.getRole()
   },
   methods:{
     getList(){
@@ -317,6 +365,11 @@ export default{
     },
     openFilter(){
       this.queryFormVisible = true
+    },
+    getRole(){
+      getRole().then(response => {
+        this.isAdmin = response.data === 'admin'
+      })
     },
     handleFilter(){
       this.listQuery.page = 1
@@ -503,11 +556,63 @@ export default{
     },
     formatFormula(formula) {
       return formula.replace(/(\d+)/g, '<sub>$1</sub>');
+    },
+    handleRecord(row){
+      this.recordVisible = true
+      this.recordQuery.id = row.id
+      this.currentName = row.name
+      getRecord(this.recordQuery).then(response => {
+        this.recordList = response.data
+      })
+    },
+    resetRecord(){
+      this.recordList = null
+      this.currentName = ''
+      this.recordQuery = {
+        page: 1,
+        limit: 10,
+        sort:'+id',
+        id: undefined,
+      }
+    },
+    handleUpload(){
+      this.handleImport()
+    },
+    handleImport() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = e => {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet);
+          console.log(jsonData);
+          // 在这里处理 jsonData
+
+        };
+        reader.readAsArrayBuffer(file);
+      };
+      input.click();
+    },
+    getUploadTemplate(){
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then(excel =>{
+        const tHeader = ['id','name','nickName','producer','location','specification','stock','formula','cas','url']
+        const filterVal = []
+        const list = []
+        list.push(filterVal)
+        excel.export_json_to_excel({
+          header: tHeader,
+          data: list,
+          filename: '药物模板'
+        })
+        this.downloadLoading = false
+      })
     }
-    
-    
   }
-  
 }
 
 </script>
