@@ -5,28 +5,7 @@
     <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
-      <el-dropdown class="avatar-container" trigger="click">
-        <div class="avatar-wrapper">
-          <!-- <img src="@/icons/svg/user.svg" class="user-avatar"> -->
-          <i class="el-icon-caret-bottom" />
-        </div>
-        <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/profile/index">
-            <el-dropdown-item>
-              个人中心
-            </el-dropdown-item>
-          </router-link>
-          <a target="_blank" href="https://github.com/SofiaCabello/DatabaseFrontend">
-            <el-dropdown-item>Github</el-dropdown-item>
-          </a>
-          <a target="_blank" href="https://github.com/SofiaCabello/DatabaseFrontend/blob/main/README.md">
-            <el-dropdown-item>文档</el-dropdown-item>
-          </a>
-          <el-dropdown-item divided @click.native="logout">
-            <span style="display:block;">登出</span>
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+      <el-button type="danger" size="mini" @click="logout" style="margin-right: 10px;">登出</el-button>
     </div>
   </div>
 </template>

@@ -57,8 +57,8 @@ export default {
     return {
       captcha: '',
       loginForm: {
-        username: 'test1',
-        password: '111111',
+        username: '',
+        password: '',
       },
       loginRules: {
         username: [

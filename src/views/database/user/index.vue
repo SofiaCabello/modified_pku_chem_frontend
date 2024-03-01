@@ -41,6 +41,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
+          <el-button type="warning" size="mini" @click="handleUpdate(row)">
+            编辑
+          </el-button>
           <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
             删除
           </el-button>
@@ -70,7 +73,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="createData()">确 定</el-button>
+        <el-button type="primary" @click="dialogStatus === 'create' ? createData() : updateData()">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -78,7 +81,7 @@
 
 <script>
 import Pagination from '@/components/Pagination/index'
-import { getUser,updateUser, createUser } from '@/api/user'
+import { getUser, updateUser, createUser, deleteUser } from '@/api/user'
 
 
 const roleOptions = [
@@ -126,6 +129,10 @@ export default{
       dialogStatus: '',
       textMap: {
         create: '添加用户',
+        update: '编辑用户'
+      },
+      deleteQuery:{
+        id: undefined
       },
       rules:{},
       downloadLoading: false
@@ -208,13 +215,10 @@ export default{
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() =>{
-        deleteUser(row.id).then(() => {
-          this.list.splice(index,1)
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
+      }).then(() => {
+        this.deleteQuery.id = row.id
+        deleteUser(this.deleteQuery).then(() => {
+          this.getList()
         })
       })
     },
@@ -244,6 +248,25 @@ export default{
     getSortClass: function(key){
       const sort = this.listQuery.sort
       return sort === key ? 'ascending' : sort === '-' + key ? 'descending' : ''
+    },
+    handleUpdate(row){
+      this.temp = Object.assign({},row)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    updateData(){
+      this.$refs['dataForm'].validate((valid) => {
+        if(valid){
+          const tempData = Object.assign({},this.temp)
+          updateUser(tempData).then(() => {
+            this.getList()
+            this.dialogFormVisible = false
+          })
+        }
+      })
     }
     
   }
