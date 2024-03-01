@@ -8,6 +8,17 @@ export function login(data) {
   })
 }
 
+export function deleteUser(query, token){
+  return request({
+    url: '/user/deleteUser',
+    method: 'post',
+    params: query,
+    headers: {
+      'Authorization' : `Bearer ${token}`
+    }
+  })
+}
+
 export function getRole(token){
   return request({
     url: '/user/getRole',
@@ -26,11 +37,14 @@ export function getInfo(token) {
   })
 }
 
-export function updateUser(data) {
+export function updateUser(data, token) {
   return request({
     url: '/user/updateUser',
     method: 'post',
-    data
+    data,
+    headers: {
+      'Authorization' : `Bearer ${token}`
+    }
   })
 }
 

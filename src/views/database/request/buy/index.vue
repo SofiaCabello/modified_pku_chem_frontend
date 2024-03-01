@@ -71,19 +71,22 @@
       <pagination v-show="hazardTotal>0" :total="hazardTotal" :page.sync="hazardQuery.page" :limit.sync="hazardQuery.limit" @pagination="getHazardList" />
       
       <el-dialog title="新建申请" :visible.sync="createRequestVisible" width="50%" :close-on-click-modal="false">
-        <el-form ref="queryForm"  :rules="rules" :model="temp" label-position="left" label-width="90px" style="width: 400px; margin-left: 50px;">
+        <el-form ref="queryForm"  :rules="rules" :model="temp" label-position="left" label-width="90px" style="margin-left: 30px; margin-right: 30px;">
           <el-form-item label="垃圾类型" prop="type">
-            <el-select v-model="temp.type" placeholder="请选择垃圾类型" style="width: 100%" class="filter-item">
+            <el-select v-model="temp.type" placeholder="请选择垃圾类型" style="width: 80%" class="filter-item">
               <el-option v-for="item in wasteOptions" :key="item" :label="item" :value="item"/>
             </el-select>
           </el-form-item>
           <el-form-item label="垃圾位置" prop="location">
-            <el-select v-model="tempString" placeholder="请选择实验室" style="width: 45%" class="filter-item">
+            <el-select v-model="tempString" placeholder="请选择实验室" style="width: 35%" class="filter-item">
               <el-option v-for="item in labOptions" :key="item" :label="item" :value="item"/>
             </el-select>
-            <el-select v-model="temp.location" placeholder="请选择存储位置" style="width:55%" class="filter-item">
+            <el-select v-model="temp.location" placeholder="请选择存储位置" style="width:35%" class="filter-item">
               <el-option v-for="item in locationOptions" :key="item" :label="item" :value="item"/>
             </el-select>
+            <span>
+              第<el-input v-model="layer" style="width: 20%;"></el-input>层
+            </span>
           </el-form-item>
           <el-form-item label="当前日期" prop="date">
             <!-- 显示当前日期 -->
@@ -145,6 +148,7 @@ export default {
       },
       createRequestVisible: false,
       tempString: '',
+      layer: '',
       temp: {
         type: '',
         location: '',
@@ -214,13 +218,14 @@ export default {
     },
     handleCreate(){
       let combinedString = this.tempString + this.temp.location
+      if(this.layer){
+        combinedString = combinedString + '第' + this.layer + '层'
+      }
       this.temp.location = combinedString
-      console.log(combinedString, this.temp.location, this.tempString)
       createHazardRequest(this.temp,this.userToken).then(response => {
         this.createRequestVisible = false
         this.getHazardList()
         this.resetTemp()
-        
       })
     },
     handleBuyRead(row){
@@ -241,6 +246,7 @@ export default {
         location: '',
       }
       this.tempString = ''
+      this.layer = ''
     }
   },
 }

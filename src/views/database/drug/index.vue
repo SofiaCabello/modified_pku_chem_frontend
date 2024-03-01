@@ -8,6 +8,12 @@
       <span v-if="isAdmin" style="margin-left: 10px">
         <el-button type="primary" icon="el-icon-upload2" class="filter-item" @click="handleUpload">导入</el-button>
         <el-button type="primary" icon="el-icon-document" class="filter-item" @click="getUploadTemplate">模板</el-button>
+        <!--在这里做一个帮助按钮，悬浮时显示-->
+        <el-tooltip effect="light"
+          content="导入时请使用模板。stock为0表示无货，1表示有货。lab、location、layer为实验室、存储位置、层数，layer可为空。化学式中的数字会被自动转化为下标。" 
+          placement="top" style="margin-left: 5px; color : #409EFF;">
+          <i class="el-icon-question filter-item"></i>
+        </el-tooltip>
       </span>
     </div>
 
@@ -51,8 +57,8 @@
         </el-form-item>
         <el-form-item label="库存" prop="stock">
           <el-select v-model="listQuery.stock" placeholder="请选择库存" style="width: 80%" class="filter-item">
-            <el-option label="有货" value="in_stock"></el-option>
-            <el-option label="无货" value="out_of_stock"></el-option>
+            <el-option label="有货" value=1></el-option>
+            <el-option label="无货" value=0></el-option>
           </el-select>
           <el-button style="width: 15%; margin-left:10px" @click="listQuery.stock = ''">重置</el-button>
         </el-form-item>
@@ -98,7 +104,7 @@
       </el-table-column>
       <el-table-column label="库存" prop="stock" width="60" align="center" sortable="custom" :class-name="getSortClass('stock')">
         <template slot-scope="{row}">
-          <span v-if="row.stock === 'in_stock'">有货</span>
+          <span v-if="row.stock === 1">有货</span>
           <span v-else>无货</span>
         </template>
       </el-table-column>
@@ -115,24 +121,29 @@
     <el-table-column label="网址" prop="url" width="120" align="center" :class-name="getSortClass('url')">
       <template slot-scope="{row}">
         <span>{{ row.url }}</span>
-      </template>"
+      </template>
     </el-table-column>
-      <el-table-column label="操作" align="center" width="400px" class-name="small-padding fixed-width">
-        <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="purchaseVisible = true; purchaseTemp = row">
-            购买申请
-          </el-button>
-          <el-button type="info" size="mini" @click="handleRecord(row)">
-            购买记录
-          </el-button>
-          <el-button type="warning" size="mini" @click="handleUpdate(row)">
-            编辑
-          </el-button>
-          <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
-            删除
-          </el-button>
-        </template>
-      </el-table-column>
+    <el-table-column label="备注" prop="note" width="200" align="center">
+      <template slot-scope="{row}">
+        <span>{{ row.note }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column label="操作" align="center" width="400px" class-name="small-padding fixed-width">
+      <template slot-scope="{row,$index}">
+        <el-button type="primary" size="mini" @click="purchaseVisible = true; purchaseTemp = row">
+          购买申请
+        </el-button>
+        <el-button type="info" size="mini" @click="handleRecord(row)">
+          购买记录
+        </el-button>
+        <el-button type="warning" size="mini" @click="handleUpdate(row)">
+          编辑
+        </el-button>
+        <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
+          删除
+        </el-button>
+      </template>
+    </el-table-column>
     </el-table>
 
     <el-dialog title="购买记录" :visible.sync="recordVisible">
@@ -221,8 +232,8 @@
         </el-form-item>
         <el-form-item label="库存" prop="stock">
           <el-select v-model="stockDisplay" placeholder="请选择库存" style="width: 100%" class="filter-item">
-            <el-option label="有货" value="in_stock"></el-option>
-            <el-option label="无货" value="out_of_stock"></el-option>
+            <el-option label="有货" value=1></el-option>
+            <el-option label="无货" value=0></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="化学式" prop="formula">
@@ -233,6 +244,9 @@
         </el-form-item>
         <el-form-item label="网址" prop="url">
           <el-input v-model="temp.url" placeholder="请输入网址"></el-input>
+        </el-form-item>
+        <el-form-item label="备注" prop="note">
+          <el-input v-model="temp.note" placeholder="请输入备注"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -257,7 +271,7 @@ export default{
   computed:{
     stockDisplay: {
       get(){
-        return this.temp.stock === 'in_stock' ? '有货' : '无货'
+        return this.temp.stock === 1 ? '有货' : '无货'
       },
       set(val){
         this.temp.stock = val
@@ -313,7 +327,7 @@ export default{
         location: '',
         layer: '',
         url: '',
-        stock: '',
+        stock: undefined,
       },
       purchaseTemp: {
         drug_id: undefined,
@@ -515,8 +529,8 @@ export default{
     handleDownload(){
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel =>{
-        const tHeader = ['试剂ID','试剂名','别名','厂家 & 品牌','位置','规格','库存','化学式','CAS','网址']
-        const filterVal = ['id','name','nickName','producer','location','specification','stock','formula','cas','url']
+        const tHeader = ['试剂ID','试剂名','别名','厂家 & 品牌','实验室','位置','层数','规格','库存','化学式','CAS','网址']
+        const filterVal = ['id','name','nickName','producer','lab','location','layer','specification','stock','formula','cas','url']
         const list = this.formatJson(filterVal)
         excel.export_json_to_excel({
           header: tHeader,
@@ -589,9 +603,11 @@ export default{
           const workbook = XLSX.read(data, { type: 'array' });
           const worksheet = workbook.Sheets[workbook.SheetNames[0]];
           const jsonData = XLSX.utils.sheet_to_json(worksheet);
-          console.log(jsonData);
-          // 在这里处理 jsonData
-
+          for(let i = 0; i < jsonData.length; i++){
+            createDrug(jsonData[i]).then(() => {
+              this.getList()
+            })
+          }
         };
         reader.readAsArrayBuffer(file);
       };
@@ -600,7 +616,7 @@ export default{
     getUploadTemplate(){
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel =>{
-        const tHeader = ['id','name','nickName','producer','location','specification','stock','formula','cas','url']
+        const tHeader = ['name','nickName','producer','lab','location','layer','specification','stock','formula','cas','url','note']
         const filterVal = []
         const list = []
         list.push(filterVal)
