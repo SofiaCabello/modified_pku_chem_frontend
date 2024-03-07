@@ -530,27 +530,29 @@ export default{
       })
     },
     getAllDataUnderCurrentQuery(){
-      getAll(this.listQuery).then(response => {
+      return getAll(this.listQuery).then(response => {
         this.allList = response.data
       })
     },
     handleDownload(){
       this.downloadLoading = true
-      this.getAllDataUnderCurrentQuery()
-      import('@/vendor/Export2Excel').then(excel =>{
-        const tHeader = ['试剂ID','试剂名','别名','厂家 & 品牌','实验室','位置','层数','规格','库存','化学式','CAS','网址','备注']
-        const filterVal = ['id','name','nickName','producer','lab','location','layer','specification','stock','formula','cas','url','note']
-        const list = this.formatJson(filterVal, this.allList)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data: list,
-          filename: '药物列表'
+      this.getAllDataUnderCurrentQuery().then(() => {
+        import('@/vendor/Export2Excel').then(excel =>{
+          console.log(this.allList)
+          const tHeader = ['试剂ID','试剂名','别名','厂家 & 品牌','实验室','位置','层数','规格','库存','化学式','CAS','网址','备注']
+          const filterVal = ['id','name','nickName','producer','lab','location','layer','specification','stock','formula','cas','url','note']
+          const resultList = this.formatJson(filterVal, this.allList)
+          excel.export_json_to_excel({
+            header: tHeader,
+            data: resultList,
+            filename: '药物列表'
+          })
+          this.downloadLoading = false
         })
-        this.downloadLoading = false
       })
     },
     formatJson(filterVal){  
-      return this.list.map(v => filterVal.map(j => {
+      return this.allList.map(v => filterVal.map(j => {
         if(j === 'type'){
           return typeKeyValue[v[j]]
         }else{
@@ -638,7 +640,7 @@ export default{
       })
     },
     chemsrcUrl(cas){
-       return `https://www.chemsrc.com/cas/${cas}.html`
+       return `https://www.chemicalbook.com/Search.aspx?keyword=${cas}`
     },
     querySearch(queryString, cb){
       if(queryString){
