@@ -23,10 +23,18 @@
           <el-input v-model="listQuery.name" placeholder="请输入试剂名/别名"></el-input>
         </el-form-item>
         <el-form-item label="厂家 & 品牌" prop="producer">
-          <el-select v-model="listQuery.producer" placeholder="请选择厂家 & 品牌" style="width: 80%" class="filter-item">
+          <!-- <el-select v-model="listQuery.producer" placeholder="请选择厂家 & 品牌" style="width: 80%" class="filter-item">
             <el-option v-for="item in tagList.producerTags" :key="item" :label="item" :value="item"/>
-          </el-select>
-          <el-button style="width: 15%; margin-left: 10px;" @click="listQuery.producer = ''">重置</el-button>
+          </el-select> -->
+          <el-autocomplete
+            style="width: 100%"
+            class="inline-input"
+            v-model="listQuery.producer"
+            :fetch-suggestions="querySearch"
+            placeholder="请输入厂家并选择"
+            :trigger-on-focus="false"
+            @select="handleSelect"
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item label="规格" prop="specification">
           <el-input v-model="listQuery.specification" placeholder="请输入规格"></el-input>
@@ -199,9 +207,15 @@
           <el-input v-model="temp.nickName" placeholder="请输入别名"></el-input>
         </el-form-item>
         <el-form-item label="厂家 & 品牌" prop="producer">
-          <el-select v-model="temp.producer" placeholder="请选择厂家 & 品牌" style="width: 100%" class="filter-item">
-            <el-option v-for="item in tagList.producerTags" :key="item" :label="item" :value="item"/>
-          </el-select>
+          <el-autocomplete
+            style="width: 100%"
+            class="inline-input"
+            v-model="temp.producer"
+            :fetch-suggestions="querySearch"
+            placeholder="请输入厂家并选择"
+            :trigger-on-focus="false"
+            @select="handleSelect"
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item label="位置" prop="location">
           <el-select v-model="temp.lab" placeholder="选择实验室" style="width: 35%" class="filter-item">
@@ -327,6 +341,7 @@ export default{
         sourceTags: [],
         wasteTags: [],
       },
+      producerSuggestions: [],
       purchaseVisible: false,
       recordVisible: false,
       recordList: null,
@@ -616,6 +631,25 @@ export default{
     },
     chemsrcUrl(cas){
        return `https://www.chemsrc.com/cas/${cas}.html`
+    },
+    querySearch(queryString, cb){
+      if(queryString){
+        this.producerSuggestions = this.tagList.producerTags.map(item => {
+          return {value: item}
+        })
+        const results = queryString ? this.createFilter(queryString) : this.producerSuggestions
+        cb(results)
+      }else{
+        cb(this.producerSuggestions)
+      }
+    },
+    createFilter(queryString) {
+      return this.producerSuggestions.filter(item => {
+        return item.value.toLowerCase().indexOf(queryString.toLowerCase()) > -1;
+      });
+    },
+    handleSelect(item){
+      this.temp.producer = item.value
     }
   }
 }
