@@ -67,6 +67,9 @@
           </el-select>
           <el-button style="width: 15%; margin-left:10px" @click="listQuery.stock = ''">重置</el-button>
         </el-form-item>
+        <el-form-item label="备注" prop="note">
+          <el-input v-model="listQuery.note" placeholder="请输入备注"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="queryFormVisible = false">取 消</el-button>
@@ -296,6 +299,7 @@ export default{
         layer: undefined,
         url: undefined,
         stock: undefined,
+        note: undefined,
       },
       purchaseVisible: false,
       sortOptions:[
