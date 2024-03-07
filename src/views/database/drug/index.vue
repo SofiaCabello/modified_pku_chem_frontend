@@ -516,8 +516,8 @@ export default{
       this.downloadLoading = true
       this.getAllDataUnderCurrentQuery()
       import('@/vendor/Export2Excel').then(excel =>{
-        const tHeader = ['试剂ID','试剂名','别名','厂家 & 品牌','实验室','位置','层数','规格','库存','化学式','CAS','网址']
-        const filterVal = ['id','name','nickName','producer','lab','location','layer','specification','stock','formula','cas','url']
+        const tHeader = ['试剂ID','试剂名','别名','厂家 & 品牌','实验室','位置','层数','规格','库存','化学式','CAS','网址','备注']
+        const filterVal = ['id','name','nickName','producer','lab','location','layer','specification','stock','formula','cas','url','note']
         const list = this.formatJson(filterVal, this.allList)
         excel.export_json_to_excel({
           header: tHeader,
