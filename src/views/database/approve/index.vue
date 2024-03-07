@@ -9,13 +9,18 @@
           </template>
         </el-table-column>
         <el-table-column label="申请人" prop="realName" sortable align="center"  :class-name="getHazardSortClass('requester')">
-        <template slot-scope="{row}">
-          <span>{{ row.user.realName }}</span>
-        </template>
-      </el-table-column>
+          <template slot-scope="{row}">
+            <span>{{ row.user.realName }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="项目名称" prop="name" sortable align="center"  :class-name="getBuySortClass('name')">
           <template slot-scope="{row}">
             <span>{{ row.drug.producer }} 制造的 {{ row.drug.specification }} 的 {{  row.drug.name }}，数量 {{ row.quantity }} </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="网址" prop="url" align="center">
+          <template slot-scope="{row}">
+            <a :href="row.drug.url" target="_blank" style="color:royalblue;">{{ row.drug.url }}</a>
           </template>
         </el-table-column>
         <el-table-column label="申请时间" prop="requestDate" sortable align="center"  :class-name="getBuySortClass('requestDate')">

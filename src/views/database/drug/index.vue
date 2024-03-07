@@ -107,12 +107,12 @@
       </el-table-column>
       <el-table-column label="CAS" prop="cas" width="120" align="center" sortable="custom" :class-name="getSortClass('cas')">
         <template slot-scope="{row}">
-          <span>{{ row.cas }}</span>
+          <a :href="chemsrcUrl(row.cas)" target="_blank" style="color: royalblue">{{ row.cas }}</a>
         </template>
       </el-table-column>
-    <el-table-column label="网址" prop="url" width="120" align="center" :class-name="getSortClass('url')">
+    <el-table-column label="网址" prop="url" width="180" align="center" :class-name="getSortClass('url')">
       <template slot-scope="{row}">
-        <span>{{ row.url }}</span>
+          <a :href="row.url" target="_blank" style="color: royalblue">{{ row.url }}</a>
       </template>
     </el-table-column>
     <el-table-column label="备注" prop="note" width="200" align="center">
@@ -254,7 +254,6 @@ import XLSX from 'xlsx';
 export default{
   name:'drugTable',
   components:{ Pagination },
-  computed:{ },
   filters:{
     typeFilter(type){
       return typeKeyValue[type]
@@ -614,6 +613,9 @@ export default{
         })
         this.downloadLoading = false
       })
+    },
+    chemsrcUrl(cas){
+       return `https://www.chemsrc.com/cas/${cas}.html`
     }
   }
 }
