@@ -70,6 +70,9 @@
         <el-form-item label="备注" prop="note">
           <el-input v-model="listQuery.note" placeholder="请输入备注"></el-input>
         </el-form-item>
+        <el-form-item label="购买人" prop="realName">
+          <el-input v-model="listQuery.realName" placeholder="请输入购买人"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="queryFormVisible = false">取 消</el-button>
@@ -300,6 +303,7 @@ export default{
         url: undefined,
         stock: undefined,
         note: undefined,
+        realName: undefined,
       },
       purchaseVisible: false,
       sortOptions:[
