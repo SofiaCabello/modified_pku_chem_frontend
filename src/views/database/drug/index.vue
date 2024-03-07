@@ -247,7 +247,7 @@
 import Pagination from '@/components/Pagination/index'
 import { getRole } from '@/api/user'
 import { postPurchaseRequest } from '@/api/request/buy'
-import { fetchList, updateDrug, createDrug, deleteDrug, getRecord } from '@/api/drug'
+import { fetchList, updateDrug, createDrug, deleteDrug, getRecord, getAll } from '@/api/drug'
 import { getDictionary } from '@/api/dictionary'
 import XLSX from 'xlsx';
 
@@ -264,6 +264,7 @@ export default{
     return {
       tableKey: 0,
       list: null,
+      allList: null,
       total: 0,
       listLoading: true,
       listQuery: {
@@ -506,12 +507,18 @@ export default{
         })
       })
     },
+    getAllDataUnderCurrentQuery(){
+      getAll(this.listQuery).then(response => {
+        this.allList = response.data
+      })
+    },
     handleDownload(){
       this.downloadLoading = true
+      this.getAllDataUnderCurrentQuery()
       import('@/vendor/Export2Excel').then(excel =>{
         const tHeader = ['试剂ID','试剂名','别名','厂家 & 品牌','实验室','位置','层数','规格','库存','化学式','CAS','网址']
         const filterVal = ['id','name','nickName','producer','lab','location','layer','specification','stock','formula','cas','url']
-        const list = this.formatJson(filterVal)
+        const list = this.formatJson(filterVal, this.allList)
         excel.export_json_to_excel({
           header: tHeader,
           data: list,

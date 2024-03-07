@@ -8,6 +8,14 @@ export function fetchList(query) {
   })
 }
 
+export function getAll(query) {
+  return request({
+    url:'/drug/getAll',
+    method: 'get',
+    params: query
+  })
+}
+
 export function getDrugList() {
   return request({
     url: '/drug/getDrugList',
