@@ -33,7 +33,8 @@
             :fetch-suggestions="querySearch"
             placeholder="请输入厂家并选择"
             :trigger-on-focus="false"
-            @select="handleSelect"
+            @select="handleQuerySelect"
+            @change="handleQueryChange"
           ></el-autocomplete>
         </el-form-item>
         <el-form-item label="规格" prop="specification">
@@ -220,7 +221,8 @@
             :fetch-suggestions="querySearch"
             placeholder="请输入厂家并选择"
             :trigger-on-focus="false"
-            @select="handleSelect"
+            @select="handleAddSelect"
+            @change="handleAddChange"
           ></el-autocomplete>
         </el-form-item>
         <el-form-item label="位置" prop="location">
@@ -361,6 +363,8 @@ export default{
       },
       currentName: '',
       isAdmin: false,
+      lastSelectedAddValue: '',
+      lastSelectedQueryValue: '',
     }
   },
   created() {
@@ -658,8 +662,33 @@ export default{
         return item.value.toLowerCase().indexOf(queryString.toLowerCase()) > -1;
       });
     },
-    handleSelect(item){
+    handleAddSelect(item){
       this.temp.producer = item.value
+      this.lastSelectedValue = item.value
+    },
+    handleAddChange(value){
+      // 强制用户选择建议中的值
+      if(!this.producerSuggestions.some(item => item.value === value)){
+        this.$message({
+          type: 'error',
+          message: '请选择建议中的值'
+        })
+        this.temp.producer = this.lastSelectedValue
+      }
+    },
+    handleQuerySelect(item){
+      this.listQuery.producer = item.value
+      this.lastSelectedQueryValue = item.value
+    },
+    handleQueryChange(value){
+      // 强制用户选择建议中的值
+      if(!this.producerSuggestions.some(item => item.value === value)){
+        this.$message({
+          type: 'warning',
+          message: '请选择建议中的值'
+        })
+        this.listQuery.producer = this.lastSelectedQueryValue
+      }
     }
   }
 }
