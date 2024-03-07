@@ -65,3 +65,10 @@ export function setBuyRead(query, token){
     }
   })
 }
+
+export function getRecentRecord(){
+  return request({
+    url: '/purchaseRecord/getRecentRecord',
+    method: 'get'
+  })
+}

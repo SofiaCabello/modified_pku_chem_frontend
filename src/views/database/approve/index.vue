@@ -1,7 +1,10 @@
 <template>
   <div class="approve-container">
     <div class="buy-request">
-      <h1>购买申请</h1>
+      <div class="buy-title">
+        <h1>购买申请</h1>
+        <el-button type="primary" size="small" @click="showRecentRecord">查看最近记录</el-button>
+      </div>
       <el-table :key="buyTableKey" v-loading="buyListLoading" :data="buyList" boder fit highlight-current-row style="width: 100%" @sort-change="buySortChange">
         <el-table-column label="申请ID" prop="id" sortable align="center"  :class-name="getBuySortClass('id')">
           <template slot-scope="{row}">
@@ -37,6 +40,15 @@
       </el-table>
 
       <pagination v-show="buyTotal>0" :total="buyTotal" :page.sync="buyQuery.page" :limit.sync="buyQuery.limit" @pagination="getBuyList" />
+      
+      <el-dialog title="最近记录" :visible.sync="recentRecordVisible" width="fit-content" center>
+        <el-timeline align="alternate">
+          <el-timeline-item v-for="item in recentRecordList" :key="item.id" :timestamp="item.approveDate" placement="top">
+            {{ item.processorName }} 批准了 {{ item.buyerName }} 的 {{ item.drugName }} 的购买申请，数量 {{ item.quantity }}
+          </el-timeline-item>
+        </el-timeline>
+          
+      </el-dialog>
     </div>
 
     <div class="hazard-request">
@@ -78,7 +90,7 @@
 
 <script>
 import Pagination from '@/components/Pagination/index.vue'
-import { getAllBuy, approveBuyRequest, rejectBuyRequest} from '@/api/request/buy'
+import { getAllBuy, approveBuyRequest, rejectBuyRequest, getRecentRecord} from '@/api/request/buy'
 import { getAllHazard, approveHazardRequest, rejectHazardRequest } from '@/api/request/hazard';
 
 export default {
@@ -106,7 +118,9 @@ export default {
       hazardTableKey: 0,
       requestQuery: {
         requestId: '',
-      }
+      },
+      recentRecordVisible: false,
+      recentRecordList: [],
     };
   },
   created() {
@@ -157,7 +171,14 @@ export default {
       rejectHazardRequest(this.requestQuery, this.$store.token).then(res => {
         this.getHazardList()
       })
+    },
+    showRecentRecord() {
+      this.recentRecordVisible = true
+      getRecentRecord().then(res => {
+        this.recentRecordList = res.data
+      })
     }
+
   }
 };
 </script>
@@ -166,11 +187,16 @@ export default {
 .approve-container{
   .buy-request{
     margin-left: 15px;
-    h1{
-      font-size: 20px;
-      font-weight: 700;
-      color: #333333;
-      margin-bottom: 20px;
+    .buy-title{
+      display: flex;
+      align-items: center;
+      h1{
+        margin-right: 15px ;  
+        font-size: 20px;
+        font-weight: 700;
+        color: #333333;
+      }
+    
     }
   }
   .hazard-request{
