@@ -4,11 +4,6 @@
     <div class="buy-request">
       <h1>购买申请</h1>
       <el-table :key="buyTableKey" v-loading="buyListLoading" :data="buyList" boder fit highlight-current-row style="width: 100%" @sort-change="buySortChange">
-        <el-table-column label="申请ID" prop="id" sortable align="center"  :class-name="getBuySortClass('id')">
-          <template slot-scope="{row}">
-            <span>{{ row.id }}</span>
-          </template>
-        </el-table-column>
         <el-table-column label="项目名称" prop="name" sortable align="center"  :class-name="getBuySortClass('name')">
           <template slot-scope="{row}">
             <span>{{ row.requestDate }} 申请购买的 {{ row.drug.producer }} 制造的 {{ row.drug.specification }} 的 {{  row.drug.name }}，数量 {{ row.quantity }}</span>
@@ -41,11 +36,6 @@
         <el-button type="primary" size="small" @click="createRequest">新建申请</el-button>
       </div>
       <el-table :key="hazardTableKey" v-loading="hazardListLoading" :data="hazardList" boder fit highlight-current-row style="width: 100%" @sort-change="hazardSortChange">
-      <el-table-column label="申请ID" prop="id" sortable align="center"  :class-name="getHazardSortClass('id')">
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="项目名称" prop="name" sortable align="center"  :class-name="getHazardSortClass('name')">
         <template slot-scope="{row}">
             <span>位于 {{ row.location }} 的 {{ row.type }}</span>
@@ -71,7 +61,7 @@
       <pagination v-show="hazardTotal>0" :total="hazardTotal" :page.sync="hazardQuery.page" :limit.sync="hazardQuery.limit" @pagination="getHazardList" />
       
       <el-dialog title="新建申请" :visible.sync="createRequestVisible" width="50%" :close-on-click-modal="false">
-        <el-form ref="queryForm"  :rules="rules" :model="temp" label-position="left" label-width="90px" style="margin-left: 30px; margin-right: 30px;">
+        <el-form ref="queryForm" :model="temp" label-position="left" label-width="90px" style="margin-left: 30px; margin-right: 30px;">
           <el-form-item label="垃圾类型" prop="type">
             <el-select v-model="temp.type" placeholder="请选择垃圾类型" style="width: 80%" class="filter-item">
               <el-option v-for="item in wasteOptions" :key="item" :label="item" :value="item"/>

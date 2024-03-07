@@ -22,9 +22,6 @@
         <el-form-item label="试剂名/别名" prop="name">
           <el-input v-model="listQuery.name" placeholder="请输入试剂名/别名"></el-input>
         </el-form-item>
-        <el-form-item label="试剂ID" prop="id">
-          <el-input v-model="listQuery.id" placeholder="请输入试剂ID"></el-input>
-        </el-form-item>
         <el-form-item label="厂家 & 品牌" prop="producer">
           <el-select v-model="listQuery.producer" placeholder="请选择厂家 & 品牌" style="width: 80%" class="filter-item">
             <el-option v-for="item in tagList.producerTags" :key="item" :label="item" :value="item"/>
@@ -71,11 +68,6 @@
   
 
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%" @sort-change="sortChange">
-      <el-table-column label="试剂ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="试剂名" prop="name" width="120" align="center" :class-name="getSortClass('name')">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
@@ -148,11 +140,6 @@
 
     <el-dialog title="购买记录" :visible.sync="recordVisible">
       <el-table :data="recordList" border fit highlight-current-row style="width: 100%">
-        <el-table-column label="购买ID" prop="id" align="center" width="80">
-          <template slot-scope="{row}">
-            <span>{{ row.id }}</span>
-          </template>
-        </el-table-column>
         <el-table-column label="购买渠道" prop="source" align="center">
           <template slot-scope="{row}">
             <span>{{ row.source }}</span>
@@ -180,7 +167,7 @@
     <el-dialog title="购买申请" :visible.sync="purchaseVisible">
       <el-form ref="dataForm" :model="purchaseTemp" label-position="left" label-width="180px" style="width: 400px; margin-left: 50px;">
         <el-form-item label="当前试剂信息" prop="name">
-          编号为{{purchaseTemp.id}}，{{purchaseTemp.producer}}生产的{{ purchaseTemp.specification }}规格的{{ purchaseTemp.name }}
+          {{purchaseTemp.producer}}生产的{{ purchaseTemp.specification }}规格的{{ purchaseTemp.name }}
         </el-form-item>
         <el-form-item label="请选择购买渠道" prop="name">
           <el-select v-model="purchaseTemp.source" placeholder="请选择购买渠道" style="width: 100%" class="filter-item">
@@ -231,9 +218,8 @@
           <el-input v-model="temp.specification" placeholder="请输入规格"></el-input>
         </el-form-item>
         <el-form-item label="库存" prop="stock">
-          <el-select v-model="stockDisplay" placeholder="请选择库存" style="width: 100%" class="filter-item">
-            <el-option label="有货" value=1></el-option>
-            <el-option label="无货" value=0></el-option>
+          <el-select v-model="temp.stock" placeholder="请选择库存" style="width: 100%" class="filter-item">
+            <el-option v-for="item in [{label : '有货', value : 1},{label : '无货', value : 0}]" :key="item.value" :label="item.label" :value="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="化学式" prop="formula">
@@ -268,16 +254,7 @@ import XLSX from 'xlsx';
 export default{
   name:'drugTable',
   components:{ Pagination },
-  computed:{
-    stockDisplay: {
-      get(){
-        return this.temp.stock === 1 ? '有货' : '无货'
-      },
-      set(val){
-        this.temp.stock = val
-      }
-    }
-  },
+  computed:{ },
   filters:{
     typeFilter(type){
       return typeKeyValue[type]
@@ -508,6 +485,8 @@ export default{
               const index = this.list.findIndex(v => v.id === this.temp.id)
               this.list.splice(index,1,this.temp)
               this.dialogFormVisible = false
+              this.resetTemp()
+              this.getList()
             })
           }
         })
