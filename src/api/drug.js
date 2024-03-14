@@ -57,7 +57,7 @@ export function getEchart(){
 
 export function getRecord(query){
   return request({
-    url: '/drug/getRecord',
+    url: '/purchaseRecord/getRecord',
     method: 'get',
     params: query
   })

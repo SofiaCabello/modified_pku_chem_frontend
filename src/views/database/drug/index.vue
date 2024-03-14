@@ -154,12 +154,7 @@
     </el-table>
 
     <el-dialog title="购买记录" :visible.sync="recordVisible">
-      <el-table :data="recordList" border fit highlight-current-row style="width: 100%">
-        <el-table-column label="购买渠道" prop="source" align="center">
-          <template slot-scope="{row}">
-            <span>{{ row.source }}</span>
-          </template>
-        </el-table-column>
+      <el-table :data="recordList" border fit highlight-current-row >
         <el-table-column label="购买数量" prop="quantity" align="center">
           <template slot-scope="{row}">
             <span>{{ row.quantity }}</span>
@@ -172,11 +167,12 @@
         </el-table-column>
         <el-table-column label="购买人" prop="buyer" align="center">
           <template slot-scope="{row}">
-            <span>{{ row.buyer }}</span>
+            <span>{{ row.buyerName }}</span>
           </template>
-
         </el-table-column>
       </el-table>
+
+      <pagination v-show="total>0" :total="recordTotal" :page.sync="recordQuery.page" :limit.sync="recordQuery.limit" @pagination="getList" style="width: 100%" />
     </el-dialog>
 
     <el-dialog title="购买申请" :visible.sync="purchaseVisible">
@@ -287,6 +283,7 @@ export default{
       list: null,
       allList: null,
       total: 0,
+      recordTotal: 0,
       listLoading: true,
       listQuery: {
         page: 1,
@@ -622,6 +619,7 @@ export default{
       this.currentName = row.name
       getRecord(this.recordQuery).then(response => {
         this.recordList = response.data
+        this.recordTotal = response.total
       })
     },
     resetRecord(){
