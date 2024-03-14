@@ -68,15 +68,9 @@
             </el-select>
           </el-form-item>
           <el-form-item label="垃圾位置" prop="location">
-            <el-select v-model="tempString" placeholder="请选择实验室" style="width: 35%" class="filter-item">
+            <el-select v-model="temp.location" placeholder="请选择实验室" style="width: 80%" class="filter-item">
               <el-option v-for="item in labOptions" :key="item" :label="item" :value="item"/>
             </el-select>
-            <el-select v-model="temp.location" placeholder="请选择存储位置" style="width:35%" class="filter-item">
-              <el-option v-for="item in locationOptions" :key="item" :label="item" :value="item"/>
-            </el-select>
-            <span>
-              第<el-input v-model="layer" style="width: 20%;"></el-input>层
-            </span>
           </el-form-item>
           <el-form-item label="当前日期" prop="date">
             <!-- 显示当前日期 -->
@@ -207,11 +201,6 @@ export default {
       this.createRequestVisible = true
     },
     handleCreate(){
-      let combinedString = this.tempString + this.temp.location
-      if(this.layer){
-        combinedString = combinedString + '第' + this.layer + '层'
-      }
-      this.temp.location = combinedString
       createHazardRequest(this.temp,this.userToken).then(response => {
         this.createRequestVisible = false
         this.getHazardList()

@@ -184,11 +184,11 @@
         <el-form-item label="当前试剂信息" prop="name">
           {{purchaseTemp.producer}}生产的{{ purchaseTemp.specification }}规格的{{ purchaseTemp.name }}
         </el-form-item>
-        <el-form-item label="请选择购买渠道" prop="name">
+        <!-- <el-form-item label="请选择购买渠道" prop="name">
           <el-select v-model="purchaseTemp.source" placeholder="请选择购买渠道" style="width: 100%" class="filter-item">
             <el-option v-for="item in tagList.sourceTags" :key="item" :label="item" :value="item"/>
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="购买数量" prop="name">
           <el-input v-model="purchaseTemp.quantity" placeholder="请输入购买数量"></el-input>
         </el-form-item>
