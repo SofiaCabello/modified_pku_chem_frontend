@@ -83,22 +83,22 @@
   
 
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%" @sort-change="sortChange">
-      <el-table-column label="试剂名" prop="name" width="120" align="center" :class-name="getSortClass('name')">
+      <el-table-column label="试剂名" prop="name" width="120" sortable align="center" :class-name="getSortClass('name')">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="别名" prop="nickName" width="120" align="center" :class-name="getSortClass('nickName')">
+      <el-table-column label="别名" prop="nickName" width="120" sortable align="center" :class-name="getSortClass('nickName')">
         <template slot-scope="{row}">
           <span>{{ row.nickName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="厂家 & 品牌" prop="producer" width="150" align="center" :class-name="getSortClass('producer')">
+      <el-table-column label="厂家 & 品牌" prop="producer" width="150" sortable align="center" :class-name="getSortClass('producer')">
         <template slot-scope="{row}">
           <span>{{ row.producer }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="位置" prop="location"  width="150" align="center" :class-name="getSortClass('location')">
+      <el-table-column label="位置" prop="lab" width="150" sortable align="center" :class-name="getSortClass('lab')">
         <template slot-scope="{row}">
           <span v-if="row.layer">{{ row.lab }}{{ row.location }}第{{ row.layer }}层</span>
           <span v-else>{{ row.lab }}{{ row.location }}</span>
@@ -397,7 +397,13 @@ export default{
     },
     sortChange(data){
       const { prop,order } = data
-      if(prop === 'id'){
+      if(prop === 'name'){
+        this.sortByName(order)
+      }if(prop === 'producer'){
+        this.sortByProducer(order)
+      }if(prop === 'lab'){
+        this.sortByLab(order)
+      }if(prop === 'id'){
         this.sortByID(order)
       }if(prop === 'stock'){
         this.sortByStock(order)
@@ -410,6 +416,30 @@ export default{
       }if(prop === 'cas'){
         this.sortByCas(order)
       }
+    },
+    sortByLab(order){
+      if(order === 'ascending'){
+        this.listQuery.sort = '+lab'
+      }else{
+        this.listQuery.sort = '-lab'
+      }
+      this.getList()
+    },
+    sortByName(order){
+      if(order === 'ascending'){
+        this.listQuery.sort = '+name'
+      }else{
+        this.listQuery.sort = '-name'
+      }
+      this.getList()
+    },
+    sortByProducer(order){
+      if(order === 'ascending'){
+        this.listQuery.sort = '+producer'
+      }else{
+        this.listQuery.sort = '-producer'
+      }
+      this.getList()
     },
     sortByID(order){
       if(order === 'ascending'){
