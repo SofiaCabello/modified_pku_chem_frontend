@@ -14,6 +14,12 @@
           placement="top" style="margin-left: 5px; color : #409EFF;">
           <i class="el-icon-question filter-item"></i>
         </el-tooltip>
+        <transition name="fade">
+          <span class="mutiple-selection" v-if="multipleSelection.length > 0" style="margin-left: 13px">
+            <el-button type="danger" icon="el-icon-delete" @click="handleMutipleDelete">批量删除</el-button>
+            <el-button type="warning" icon="el-icon-edit" @click="handleMutipleUpdate">批量编辑</el-button>
+          </span>
+        </transition>
       </span>
     </div>
 
@@ -256,7 +262,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确 定</el-button>
+        <el-button type="primary" @click="handleStatusConfirm(dialogStatus)">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -266,7 +272,7 @@
 import Pagination from '@/components/Pagination/index'
 import { getRole } from '@/api/user'
 import { postPurchaseRequest } from '@/api/request/buy'
-import { fetchList, updateDrug, createDrug, deleteDrug, getRecord, getAll } from '@/api/drug'
+import { fetchList, updateDrug, createDrug, deleteDrug, getRecord, getAll, multipleUpdateDrug } from '@/api/drug'
 import { getDictionary } from '@/api/dictionary'
 import XLSX from 'xlsx';
 
@@ -289,7 +295,7 @@ export default{
       listQuery: {
         page: 1,
         limit: 10,
-        sort:'+id',
+        sort:'+name',
         name: undefined,
         id: undefined,  
         producer: undefined,
@@ -338,7 +344,8 @@ export default{
       dialogStatus: '',
       textMap: {
         update: '编辑试剂',
-        create: '添加试剂'
+        create: '添加试剂',
+        multipleUpdate: '批量编辑试剂'
       },
       rules:{ },
       downloadLoading: false,
@@ -363,6 +370,22 @@ export default{
       isAdmin: false,
       lastSelectedAddValue: '',
       lastSelectedQueryValue: '',
+      multipleSelection: [],
+      multiTemp: {
+        ids: undefined,
+        name: '',
+        producer: '',
+        specification: '',
+        nickName: '',
+        formula: '',
+        cas: '',
+        lab: '',
+        location: '',
+        layer: '',
+        url: '',
+        stock: '',
+        note: '',
+      },
     }
   },
   created() {
@@ -570,7 +593,7 @@ export default{
       this.downloadLoading = true
       this.getAllDataUnderCurrentQuery().then(() => {
         import('@/vendor/Export2Excel').then(excel =>{
-          console.log(this.allList)
+
           const tHeader = ['试剂ID','试剂名','别名','厂家 & 品牌','实验室','位置','层数','规格','库存','化学式','CAS','网址','备注']
           const filterVal = ['id','name','nickName','producer','lab','location','layer','specification','stock','formula','cas','url','note']
           const resultList = this.formatJson(filterVal, this.allList)
@@ -718,6 +741,60 @@ export default{
         })
         this.listQuery.producer = this.lastSelectedQueryValue
       }
+    },
+    handleSelectionChange(val){
+      this.multipleSelection = val
+    },
+    handleMutipleDelete(){
+      this.$confirm('此操作将永久删除这些试剂, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() =>{
+        for(let i = 0; i < this.multipleSelection.length; i++){
+          deleteDrug(this.multipleSelection[i].id).then(() => {
+            this.getList()
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+          })
+        }
+      })
+    },
+    handleMutipleUpdate(){
+      this.resetTemp()
+      this.dialogStatus = 'multipleUpdate'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    multipleUpdateData(){
+      this.$refs['dataForm'].validate((valid) => {
+        if(valid){
+          let idArr = []
+          for(let i = 0; i < this.multipleSelection.length; i++){
+            idArr.push(this.multipleSelection[i].id)
+          }
+          const tempData = Object.assign({},this.temp)
+          tempData.ids = idArr
+          multipleUpdateDrug(tempData).then(() => {
+            this.getList()
+            this.dialogFormVisible = false
+            this.resetTemp()
+          })
+        }
+      })
+    },
+    handleStatusConfirm(status){
+      if(status === 'create'){
+        this.createData()
+      }else if(status === 'update'){
+        this.updateData()
+      }else if(status === 'multipleUpdate'){
+        this.multipleUpdateData()
+      }
     }
   }
 }
@@ -731,4 +808,10 @@ export default{
   margin-left: 15px;
 }
 
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
 </style>

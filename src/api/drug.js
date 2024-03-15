@@ -31,6 +31,14 @@ export function updateDrug(data) {
   })
 }
 
+export function multipleUpdateDrug(data){
+  return request({
+    url: '/drug/multipleUpdateDrug',
+    method: 'post',
+    data
+  })
+}
+
 export function createDrug(data) {
   return request({
     url: '/drug/createDrug',
