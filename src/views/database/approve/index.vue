@@ -44,16 +44,16 @@
       <el-dialog title="最近记录" :visible.sync="recentRecordVisible" width="fit-content" center>
         <el-timeline align="alternate">
           <el-timeline-item v-for="item in recentRecordList" :key="item.id" :timestamp="item.approveDate" placement="top">
-            {{ item.processorName }} 批准了 {{ item.buyerName }} 的 {{ item.drugName }} 的购买申请，数量 {{ item.quantity }}
+            {{ item.processorName }}批准了{{ item.buyerName }}的{{ item.drugName }}的购买申请，数量{{ item.quantity }}
           </el-timeline-item>
         </el-timeline>
-          
       </el-dialog>
     </div>
 
     <div class="hazard-request">
       <div class="hazard-title">
         <h1>危废申报</h1>
+        <el-button type="primary" size="small" @click="showRecentHazard">查看最近记录</el-button>
       </div>
       <el-table :key="hazardTableKey" v-loading="hazardListLoading" :data="hazardList" boder fit highlight-current-row style="width: 100%" @sort-change="hazardSortChange">
       <el-table-column label="申请ID" prop="id" sortable align="center"  :class-name="getHazardSortClass('id')">
@@ -84,6 +84,14 @@
         </el-table-column>
       </el-table>
       <pagination v-show="hazardTotal>0" :total="hazardTotal" :page.sync="hazardQuery.page" :limit.sync="hazardQuery.limit" @pagination="getHazardList" />
+
+      <el-dialog title="最近记录" :visible.sync="recentHazardVisible" width="fit-content" center>
+      <el-timeline align="alternate">
+        <el-timeline-item v-for="item in recentHazardList" :key="item.id" :timestamp="item.approveDate" placement="top">
+          {{ item.processorName }}批准了{{ item.requesterName }}位于{{ item.location }}的{{ item.type}}处理申请
+        </el-timeline-item>
+      </el-timeline>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -91,7 +99,7 @@
 <script>
 import Pagination from '@/components/Pagination/index.vue'
 import { getAllBuy, approveBuyRequest, rejectBuyRequest, getRecentRecord} from '@/api/request/buy'
-import { getAllHazard, approveHazardRequest, rejectHazardRequest } from '@/api/request/hazard';
+import { getAllHazard, approveHazardRequest, rejectHazardRequest, getRecentHazard} from '@/api/request/hazard'
 
 export default {
   name: "approve",
@@ -121,6 +129,8 @@ export default {
       },
       recentRecordVisible: false,
       recentRecordList: [],
+      recentHazardVisible: false,
+      recentHazardList: [],
     };
   },
   created() {
@@ -176,6 +186,12 @@ export default {
       this.recentRecordVisible = true
       getRecentRecord().then(res => {
         this.recentRecordList = res.data
+      })
+    },
+    showRecentHazard() {
+      this.recentHazardVisible = true
+      getRecentHazard().then(res => {
+        this.recentHazardList = res.data
       })
     }
 

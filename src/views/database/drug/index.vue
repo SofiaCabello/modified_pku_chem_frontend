@@ -752,14 +752,12 @@ export default{
         type: 'warning'
       }).then(() =>{
         for(let i = 0; i < this.multipleSelection.length; i++){
-          deleteDrug(this.multipleSelection[i].id).then(() => {
-            this.getList()
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-          })
+          deleteDrug(this.multipleSelection[i].id)
         }
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
       })
     },
     handleMutipleUpdate(){

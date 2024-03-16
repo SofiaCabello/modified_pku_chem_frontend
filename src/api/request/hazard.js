@@ -65,3 +65,10 @@ export function setHazardRead(query, token){
     }
   })
 }
+
+export function getRecentHazard(){
+  return request({
+    url: '/hazardRequest/getRecent',
+    method: 'get'
+  })
+}
