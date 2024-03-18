@@ -89,7 +89,7 @@
   
 
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%" @sort-change="sortChange" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" :visible.sync="isAdmin" align="center"></el-table-column>
+      <el-table-column type="selection" align="center" v-if="isAdmin"></el-table-column>
       <el-table-column label="试剂名" prop="name" width="120" sortable align="center" :class-name="getSortClass('name')">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
