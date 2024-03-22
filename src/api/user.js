@@ -8,6 +8,16 @@ export function login(data) {
   })
 }
 
+export function autoLogin(token) {
+  return request({
+    url: '/login/autoLogin',
+    method: 'post',
+    headers: {
+      'Authorization' : `Bearer ${token}`
+    }
+  })
+}
+
 export function deleteUser(query, token){
   return request({
     url: '/user/deleteUser',

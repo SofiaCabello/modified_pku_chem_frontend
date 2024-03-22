@@ -51,6 +51,8 @@
 </template>
 
 <script>
+import { autoLogin } from '@/api/user'
+
 export default {
   name: 'Login',
   data() {
@@ -73,7 +75,13 @@ export default {
       redirect: undefined
     }
   },
-  created(){},
+  created(){
+    // autoLogin(this.$store.getters.token).then(res => {
+    //   if(res.data.code === 200){
+    //     this.$router.push({ path: this.redirect || '/' })
+    //   }
+    // })
+  },
   watch: {
     $route: {
       handler: function(route) {
