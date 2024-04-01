@@ -281,6 +281,12 @@ import XLSX from 'xlsx';
 export default{
   name:'drugTable',
   components:{ Pagination },
+  mounted(){
+    // 接受来自跳转的参数
+    this.listQuery.id = this.$route.query.id
+    console.log(this.listQuery.id)
+    this.getList()
+  },
   filters:{
     typeFilter(type){
       return typeKeyValue[type]
