@@ -18,7 +18,10 @@
         </el-table-column>
         <el-table-column label="项目名称" prop="name" sortable align="center"  :class-name="getBuySortClass('name')">
           <template slot-scope="{row}">
-            <span>{{ row.drug.producer }} 制造的 {{ row.drug.specification }} 的 {{  row.drug.name }}，数量 {{ row.quantity }} </span>
+            <span>{{ row.drug.producer }} 制造的 {{ row.drug.specification }} 的 </span>
+            <!-- redirect to drug page in database -->
+            <router-link :to="{ name: '试剂库', query: { id: row.drug.id } }" style="color: royalblue;">{{ row.drug.name }}</router-link>
+            <span>数量 {{ row.quantity }} </span>
           </template>
         </el-table-column>
         <el-table-column label="网址" prop="url" align="center">

@@ -81,7 +81,7 @@
       </div>
     </div>
 
-    <div class="purchase-source">
+    <!-- <div class="purchase-source">
       <h1 class="title">购买渠道</h1>
       <div class="tag-container">
         <el-tag
@@ -106,7 +106,7 @@
         </el-input>
         <el-button v-else class="button-new-tag" size="small" @click="showInput('sourceTags')">+ New Tag</el-button>
       </div>
-    </div>
+    </div> -->
 
     <div class="waste-type">
       <h1 class="title">废弃类型</h1>

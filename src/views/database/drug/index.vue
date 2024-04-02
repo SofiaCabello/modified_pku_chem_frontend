@@ -33,7 +33,7 @@
             <el-option v-for="item in tagList.producerTags" :key="item" :label="item" :value="item"/>
           </el-select> -->
           <el-autocomplete
-            style="width: 100%"
+            style="width: 80%"
             class="inline-input"
             v-model="listQuery.producer"
             :fetch-suggestions="querySearch"
@@ -42,6 +42,7 @@
             @select="handleQuerySelect"
             @change="handleQueryChange"
           ></el-autocomplete>
+          <el-button @click="listQuery.producer = ''" style="margin-left: 10px; width: 15%;">重置</el-button>
         </el-form-item>
         <el-form-item label="规格" prop="specification">
           <el-input v-model="listQuery.specification" placeholder="请输入规格"></el-input>
@@ -60,12 +61,12 @@
             <el-option v-for="item in tagList.locationTags" :key="item" :label="item" :value="item"/>
           </el-select>
           <span>
-            第<el-input v-model="listQuery.layer" style="width: 10%;"></el-input>层
+            第<el-input v-model="listQuery.layer" style="width: 10%;"></el-input>层/号
           </span>
           <el-button style="width: 15%; margin-left: 10px;" @click="listQuery.lab = ''; listQuery.location = ''; listQuery.layer = ''">重置</el-button>
         </el-form-item>
-        <el-form-item label="网址" prop="url">
-          <el-input v-model="listQuery.url" placeholder="请输入网址"></el-input>
+        <el-form-item label="购买渠道" prop="url">
+          <el-input v-model="listQuery.url" placeholder="请输入购买渠道"></el-input>
         </el-form-item>
         <el-form-item label="库存" prop="stock">
           <el-select v-model="listQuery.stock" placeholder="请选择库存" style="width: 80%" class="filter-item">
@@ -107,7 +108,7 @@
       </el-table-column>
       <el-table-column label="位置" prop="lab" width="150" sortable align="center" :class-name="getSortClass('lab')">
         <template slot-scope="{row}">
-          <span v-if="row.layer">{{ row.lab }}{{ row.location }}第{{ row.layer }}层</span>
+          <span v-if="row.layer">{{ row.lab }}{{ row.location }}第{{ row.layer }}层/号</span>
           <span v-else>{{ row.lab }}{{ row.location }}</span>
         </template>
       </el-table-column>
@@ -132,9 +133,10 @@
           <a :href="chemsrcUrl(row.cas)" target="_blank" style="color: royalblue">{{ row.cas }}</a>
         </template>
       </el-table-column>
-    <el-table-column label="网址" prop="url" width="180" align="center" :class-name="getSortClass('url')">
+    <el-table-column label="购买渠道" prop="url" width="180" align="center" :class-name="getSortClass('url')">
       <template slot-scope="{row}">
-          <a :href="row.url" target="_blank" style="color: royalblue">{{ row.url }}</a>
+          <a v-if="row.url.startsWith('http')" :href="row.url" target="_blank" style="color: royalblue">{{ row.url }}</a>
+          <span v-else>{{ row.url }}</span>
       </template>
     </el-table-column>
     <el-table-column label="备注" prop="note" width="200" align="center">
@@ -236,7 +238,7 @@
             <el-option v-for="item in tagList.locationTags" :key="item" :label="item" :value="item"/>
           </el-select>
           <span style="width: 30%;">
-            第<el-input v-model="temp.layer" style="width: 50px"></el-input>层
+            第<el-input v-model="temp.layer" style="width: 50px"></el-input>层/号
           </span>
         </el-form-item>
         <el-form-item label="规格" prop="specification">
@@ -253,8 +255,8 @@
         <el-form-item label="CAS" prop="cas">
           <el-input v-model="temp.cas" placeholder="请输入CAS"></el-input>
         </el-form-item>
-        <el-form-item label="网址" prop="url">
-          <el-input v-model="temp.url" placeholder="请输入网址"></el-input>
+        <el-form-item label="购买渠道" prop="url">
+          <el-input v-model="temp.url" placeholder="请输入购买渠道"></el-input>
         </el-form-item>
         <el-form-item label="备注" prop="note">
           <el-input v-model="temp.note" placeholder="请输入备注"></el-input>
@@ -279,6 +281,12 @@ import XLSX from 'xlsx';
 export default{
   name:'drugTable',
   components:{ Pagination },
+  mounted(){
+    // 接受来自跳转的参数
+    this.listQuery.id = this.$route.query.id
+    console.log(this.listQuery.id)
+    this.getList()
+  },
   filters:{
     typeFilter(type){
       return typeKeyValue[type]
@@ -347,7 +355,17 @@ export default{
         create: '添加试剂',
         multipleUpdate: '批量编辑试剂'
       },
-      rules:{ },
+      rules:{ 
+        name:[
+          {required: true, message: '请输入试剂名', trigger: 'blur'}
+        ],
+        producer:[
+          {required: true, message: '请输入厂家 & 品牌', trigger: 'blur'}
+        ],
+        location:[
+          {required: true, message: '请输入位置', trigger: 'blur'}
+        ],
+      },
       downloadLoading: false,
       tagList:{
         producerTags: [],
@@ -594,7 +612,7 @@ export default{
       this.getAllDataUnderCurrentQuery().then(() => {
         import('@/vendor/Export2Excel').then(excel =>{
 
-          const tHeader = ['试剂ID','试剂名','别名','厂家 & 品牌','实验室','位置','层数','规格','库存','化学式','CAS','网址','备注']
+          const tHeader = ['试剂ID','试剂名','别名','厂家 & 品牌','实验室','位置','层数','规格','库存','化学式','CAS','购买渠道','备注']
           const filterVal = ['id','name','nickName','producer','lab','location','layer','specification','stock','formula','cas','url','note']
           const resultList = this.formatJson(filterVal, this.allList)
           excel.export_json_to_excel({
