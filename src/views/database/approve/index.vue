@@ -8,12 +8,12 @@
       <el-table :key="buyTableKey" v-loading="buyListLoading" :data="buyList" boder fit highlight-current-row style="width: 100%" @sort-change="buySortChange">
         <el-table-column label="申请ID" prop="id" sortable align="center"  :class-name="getBuySortClass('id')">
           <template slot-scope="{row}">
-            <span>{{ row.id }}</span>
+            <span>{{ row.purchaseRequest.id }}</span>
           </template>
         </el-table-column>
         <el-table-column label="申请人" prop="realName" sortable align="center"  :class-name="getHazardSortClass('requester')">
           <template slot-scope="{row}">
-            <span>{{ row.user.realName }}</span>
+            <span>{{ row.realName }}</span>
           </template>
         </el-table-column>
         <el-table-column label="项目名称" prop="name" sortable align="center"  :class-name="getBuySortClass('name')">
@@ -21,7 +21,7 @@
             <span>{{ row.drug.producer }} 制造的 {{ row.drug.specification }} 的 </span>
             <!-- redirect to drug page in database -->
             <router-link :to="{ name: '试剂库', query: { id: row.drug.id } }" style="color: royalblue;">{{ row.drug.name }}</router-link>
-            <span>数量 {{ row.quantity }} </span>
+            <span>数量 {{ row.purchaseRequest.quantity }} </span>
           </template>
         </el-table-column>
         <el-table-column label="网址" prop="url" align="center">
@@ -31,13 +31,13 @@
         </el-table-column>
         <el-table-column label="申请时间" prop="requestDate" sortable align="center"  :class-name="getBuySortClass('requestDate')">
           <template slot-scope="{row}">
-            <span>{{ row.requestDate }}</span>
+            <span>{{ row.purchaseRequest.requestDate }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" width="200px">
           <template slot-scope="{row}">
-            <el-button type="primary" size="small" @click="approveBuy(row.id)">审批</el-button>
-            <el-button type="danger" size="small" @click="rejectBuy(row.id)">驳回</el-button>
+            <el-button type="primary" size="small" @click="approveBuy(row.purchaseRequest.id)">审批</el-button>
+            <el-button type="danger" size="small" @click="rejectBuy(row.purchaseRequest.id)">驳回</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -46,8 +46,8 @@
       
       <el-dialog title="最近记录" :visible.sync="recentRecordVisible" width="fit-content" center>
         <el-timeline align="alternate">
-          <el-timeline-item v-for="item in recentRecordList" :key="item.id" :timestamp="item.approveDate" placement="top">
-            {{ item.processorName }}批准了{{ item.buyerName }}的{{ item.drugName }}的购买申请，数量{{ item.quantity }}
+          <el-timeline-item v-for="item in recentRecordList" :key="item.id" :timestamp="item.purchaseRecord.approveDate" placement="top">
+            {{ item.processorName }}批准了{{ item.buyerName }}的{{ item.drugName }}的购买申请，数量{{ item.purchaseRecord.quantity }}
           </el-timeline-item>
         </el-timeline>
       </el-dialog>
@@ -153,6 +153,7 @@ export default {
       getAllHazard(this.hazardQuery).then(res => {
         this.hazardList = res.data;
         this.hazardTotal = res.total;
+        console.log(this.hazardList)
       })
     },
     hazardSortChange() {
@@ -162,6 +163,7 @@ export default {
     getHazardSortClass() {
     },
     approveBuy(id) {
+      console.log('id' + id)
       this.requestQuery.requestId = id
       approveBuyRequest(this.requestQuery, this.$store.token).then(res => {
         this.getBuyList()
@@ -174,6 +176,7 @@ export default {
       })
     },
     approveHazard(id) {
+      console.log('id' + id)
       this.requestQuery.requestId = id
       approveHazardRequest(this.requestQuery, this.$store.token).then(res => {
         this.getHazardList()

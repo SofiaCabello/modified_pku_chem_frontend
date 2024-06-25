@@ -32,6 +32,17 @@ import Layout from '@/layout'
  */
 export const constantRoutes = [
   {
+    path: '/',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [{
+      path: 'dashboard',
+      name: '仪表盘',
+      component: () => import('@/views/dashboard/index'),
+      meta: { title: '仪表盘', icon: 'dashboard' }
+    }]
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
@@ -90,7 +101,14 @@ export const asyncRoutes = [
       }
     ]
   },
-
+  // {
+  //   path: '/dashboard',
+  //   redirect: '/dashboard/index',
+  //   name: 'Dashboard',
+  //   component: () => import('@/views/dashboard/index'),
+  //   meta: { title: '仪表盘', icon: 'el-icon-s-help',roles: ['admin','user'] },
+  //   component: Layout,
+  // },
   { path: '*', redirect: '/404', hidden: true }
 ]
 

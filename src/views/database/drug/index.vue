@@ -96,6 +96,19 @@
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="图片" prop="image" width="200" align="center">
+        <template slot-scope="{row}">
+          <template v-if="row.image">
+            <img :src="row.image" style="width: 150px; height: auto; object-fit: contain;">
+          </template>
+          <template v-if="row.cas === null">
+
+          </template>
+          <template v-else>
+            <img :src="'https://www.chemicalbook.com/CAS/GIF/' + row.cas + '.gif'" style="width: 100px; height: auto; object-fit: contain; border-radius: 5px;">
+          </template>
+        </template>
+      </el-table-column>
       <el-table-column label="别名" prop="nickName" width="120" sortable align="center" :class-name="getSortClass('nickName')">
         <template slot-scope="{row}">
           <span>{{ row.nickName }}</span>
@@ -166,12 +179,12 @@
       <el-table :data="recordList" border fit highlight-current-row >
         <el-table-column label="购买数量" prop="quantity" align="center">
           <template slot-scope="{row}">
-            <span>{{ row.quantity }}</span>
+            <span>{{ row.purchaseRecord.quantity }}</span>
           </template>
         </el-table-column>
         <el-table-column label="批准日期" prop="date" align="center">
           <template slot-scope="{row}">
-            <span>{{ row.approveDate }}</span>
+            <span>{{ row.purchaseRecord.approveDate }}</span>
           </template>
         </el-table-column>
         <el-table-column label="购买人" prop="buyer" align="center">
@@ -261,6 +274,21 @@
         <el-form-item label="备注" prop="note">
           <el-input v-model="temp.note" placeholder="请输入备注"></el-input>
         </el-form-item>
+        <el-form-item label="图片" prop="image">
+          <el-upload
+            action="https://jsonplaceholder.typicode.com/posts/"
+            list-type="picture-card"
+            :data="{ id: temp.id }"
+            :limit="1"
+            :on-preview="handlePictureCardPreview"
+            :on-remove="handleRemove"
+            :before-upload="beforeImageUpload">
+            <i class="el-icon-plus"></i>
+          </el-upload>
+          <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -277,6 +305,32 @@ import { postPurchaseRequest } from '@/api/request/buy'
 import { fetchList, updateDrug, createDrug, deleteDrug, getRecord, getAll, multipleUpdateDrug } from '@/api/drug'
 import { getDictionary } from '@/api/dictionary'
 import XLSX from 'xlsx';
+
+class AsyncQueue {
+  constructor(maxConcurent = 1){
+    this.maxConcurent = maxConcurent
+    this.tasks = []
+    this.currentlyRunning = 0
+  }
+
+  push(promiseFactory) {
+    this.tasks.push(promiseFactory)
+    this.next()
+  }
+
+  next(){
+    if(this.currentlyRunning >= this.maxConcurent){
+      return
+    }
+
+    this.currentlyRunning++
+    const promiseFactory = this.tasks.shift()
+    promiseFactory().finally(() => {
+      this.currentlyRunning--
+      this.next()
+    })
+  }
+}
 
 export default{
   name:'drugTable',
@@ -813,6 +867,27 @@ export default{
         this.multipleUpdateData()
       }
     }
+  },
+  handlePictureCardPreview(file){
+    this.dialogImageUrl = file.url
+    this.dialogVisible = true
+  },
+  handleRemove(file, fileList){
+    this.fileList = fileList
+  },
+  beforeImageUpload(file){
+    const isJPG = file.type === 'image/jpeg'
+    const isPNG = file.type === 'image/png'
+    const isGIF = file.type === 'image/gif'
+    const isLt2M = file.size / 1024 / 1024 < 2
+
+    if(!isJPG && !isPNG && !isGIF){
+      this.$message.error('上传图片只能是 JPG/PNG/GIF 格式!')
+    }
+    if(!isLt2M){
+      this.$message.error('上传图片大小不能超过 2MB!')
+    }
+    return (isJPG || isPNG || isGIF) && isLt2M
   }
 }
 

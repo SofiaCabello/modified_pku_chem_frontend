@@ -6,21 +6,21 @@
       <el-table :key="buyTableKey" v-loading="buyListLoading" :data="buyList" boder fit highlight-current-row style="width: 100%" @sort-change="buySortChange">
         <el-table-column label="项目名称" prop="name" sortable align="center"  :class-name="getBuySortClass('name')">
           <template slot-scope="{row}">
-            <span>{{ row.requestDate }} 申请购买的 {{ row.drug.producer }} 制造的 {{ row.drug.specification }} 的 {{  row.drug.name }}，数量 {{ row.quantity }}</span>
+            <span>申请购买 {{ row.drug.producer }} 制造的 {{ row.drug.specification }} 的 {{  row.drug.name }}，数量 {{ row.purchaseRequest.quantity }}</span>
           </template>
         </el-table-column>
         <el-table-column label="申请时间" prop="requestDate" sortable align="center"  :class-name="getBuySortClass('requestDate')">
           <template slot-scope="{row}">
-            <span>{{ row.requestDate }}</span>
+            <span>{{ row.purchaseRequest.requestDate }}</span>
           </template>
         </el-table-column>
         <el-table-column label="状态" prop="status" sortable align="center"  :class-name="getBuySortClass('status')">
           <template slot-scope="{row}">
-            <span v-if="row.status === 'pending'" style="color: #FFA500">待处理</span>
-            <span v-else-if="row.status === 'approved'" style="color: #32CD32">
+            <span v-if="row.purchaseRequest.status === 'pending'" style="color: #FFA500">待处理</span>
+            <span v-else-if="row.purchaseRequest.status === 'approved'" style="color: #32CD32">
               已批准<el-button type="primary" size="mini" style="margin-left: 5px;" @click="handleBuyRead(row)">标记为已读</el-button>
             </span>
-            <span v-else-if="row.status === 'rejected'" style="color: #FF0000">
+            <span v-else-if="row.purchaseRequest.status === 'rejected'" style="color: #FF0000">
               被驳回<el-button type="primary" size="mini" style="margin-left: 5px;" @click="handleBuyRead(row)">标记为已读</el-button>
             </span>
           </template>
@@ -208,7 +208,7 @@ export default {
       })
     },
     handleBuyRead(row){
-      this.buyReadQuery.requestId = row.id
+      this.buyReadQuery.requestId = row.purchaseRequest.id
       setBuyRead(this.buyReadQuery, this.$store.token).then(response => {
         this.getBuyList()
       })
